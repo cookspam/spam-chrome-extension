@@ -1,0 +1,110 @@
+.onboarding-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background-color: #1C1C1C;
+  }
+  
+  .logo {
+	width: 75.98px;
+	height: 77.17px;
+	position: absolute;
+	top: 273.44px;
+	left: 158.29px;
+  }
+  
+  .groupImage {
+	width: 10.13px;
+	height: 19.03px;
+	position: absolute;
+	top: 291.91px;
+	left: 140.56px;
+  }
+  
+  .singleStarLeft {
+	width: 8.12px;
+	height: 11.09px;
+	position: absolute;
+	top: 329.9px;
+	left: 132.37px;
+  }
+  
+  .singleStarRight {
+	width: 6.11px;
+	height: 8.19px;
+	position: absolute;
+	top: 319.47px;
+	left: 249.91px;
+  }
+  
+  .title {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 56.17px;
+	font-style: italic;
+	font-weight: 900;
+	line-height: 68.47px;
+	text-align: center;
+	color: #27CDD0;
+	width: 175px;
+	height: 68px;
+	position: absolute;
+	top: 235.89px;
+	left: 108.86px;
+  }
+  
+  .subtitle {
+	font-family: 'Pretendard', sans-serif;
+	font-size: 15px;
+	font-weight: 400;
+	line-height: 17.9px;
+	text-align: center;
+	color: #FFFFFF;
+	width: 283px;
+	height: 36px;
+	position: absolute;
+	top: 359px;
+	left: 55px;
+  }
+  
+  .button {
+	width: 308px;
+	height: 42px;
+	position: absolute;
+	top: 447px;
+	left: 42px;
+	border-radius: 50px;
+	justify-content: 'center';
+	align-items: 'center';
+	margin-vertical: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .importButton {
+	top: 504px;
+  }
+  
+  .buttonNormal {
+	background-color: #27CDD0;
+  }
+  
+  .buttonHover {
+	background-color: #FFFFFF80;
+  }
+  
+  .buttonText {
+	font-size: 16px;
+	font-weight: bold;
+  }
+  
+  .buttonTextNormal {
+	color: #222222;
+  }
+  
+  .buttonTextHover {
+	color: #27CDD0;
+  }
+  

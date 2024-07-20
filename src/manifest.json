@@ -11,6 +11,7 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
+  
   "icons": {
     "128": "spam_character1.png"
   },

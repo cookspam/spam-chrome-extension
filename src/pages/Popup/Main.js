@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import logo from '../../assets/img/spam_character1.png';
 
-const UserInfo = ({ address }) => {
+const UserInfo = ({ pubKey }) => {
   const [solanaBalance, setSolanaBalance] = useState(0);
   const [spamAmount, setSpamAmount] = useState(0);
 
@@ -11,19 +12,19 @@ const UserInfo = ({ address }) => {
       setSpamAmount(prev => prev + 1);
     };
 
-    if (address) {
+    if (pubKey) {
       const intervalId = setInterval(mineSpam, 5000);
       return () => clearInterval(intervalId);
     }
-  }, [address]);
+  }, [pubKey]);
 
   return (
 	<div>
 	<h1>User Info</h1>
-	<p>Public Key: {address}</p>
+	<p>Public Key: {pubKey}</p>
 	<p>Solana Balance: {solanaBalance} SOL</p>
 	<p>Spam Mined: {spamAmount} SPAM</p>
-	<img src="../../assets/images/spam_character1.png" alt="Spam Character" />
+	<img src = {logo} alt="Spam Character" />
   </div>
 );
 };

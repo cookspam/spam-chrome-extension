@@ -1,0 +1,57 @@
+.importAddress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #1c1c1c;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.importAddress-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.importAddress-subtitle {
+  font-size: 12px;
+  color: #878787;
+  text-align: center;
+  margin-bottom: 20px;
+  max-width: 80%;
+}
+
+.importAddress-box {
+  display: flex;
+  flex-direction: column; /* Ensure flex direction is column */
+  align-items: center; /* Center items horizontally */
+  background-color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 10px 0;
+  width: 85%;
+  cursor: pointer;
+}
+
+.importAddress-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+}
+
+.importAddress-boxText {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center items horizontally */
+  justify-content: center; /* Center items vertically */
+  text-align: center; /* Center text inside the flex items */
+}
+
+.importAddress-boxTitle {
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+}

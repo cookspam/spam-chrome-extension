@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import { Keypair } from '@solana/web3.js'; // Import Keypair from Solana web3 library
-import bs58 from 'bs58'; // Import bs58 for encoding the private key
+import { Keypair } from '@solana/web3.js'; 
+import bs58 from 'bs58'; 
 import './ImportRecoveryPhrase.css';
 import { mnemonicToSeedSync } from 'bip39';
-
-const { toUtf8Bytes, pbkdf2 } = ethers;
-
 
 
 const ImportRecoveryPhrase = ({ onImport }) => {
@@ -44,8 +41,8 @@ const ImportRecoveryPhrase = ({ onImport }) => {
       const pubKey = keyPair.publicKey.toBase58();
       const privateKey = bs58.encode(keyPair.secretKey);
 
-      localStorage.setItem('pubKey', pubKey);
-      localStorage.setItem('privateKey', privateKey);
+      chrome.storage.local.set({'pubKey': pubKey});
+      chrome.storage.local.set({'privateKey': privateKey});
 
       console.log('Imported Keypair:', {
         pubKey,

@@ -8,7 +8,7 @@ const ImportPrivateKey = ({ onImport }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [page, setPage] = useState('import-private-key');
 
-  const handleImport = () => {
+  const handleImport = async () => {
     if (privateKey.trim() === '') {
       alert('Please enter your private key.');
       return;
@@ -25,8 +25,8 @@ const ImportPrivateKey = ({ onImport }) => {
       const pubKey = importedKeypair.publicKey.toBase58();
       const privateKeyEncoded = bs58.encode(importedKeypair.secretKey);
 
-      localStorage.setItem('pubKey', pubKey);
-      localStorage.setItem('privateKey', privateKeyEncoded);
+      chrome.storage.local.set({'pubKey': pubKey});
+      chrome.storage.local.set({'privateKey': privateKeyEncoded});
 
       console.log('Imported Keypair:', { pubKey, privateKey: privateKeyEncoded });
       onImport({ pubKey, privateKey: privateKeyEncoded });

@@ -26,34 +26,20 @@ import {
   
   const programId = new PublicKey("cookr8CThnfEQZvvrB6zhh5K4X8XNkPjJi4uUDtkBuG");
   const BUS_ADDRESSES = [
-	// Your bus addresses here
+	"DzLpPA3uYgTzSnCJDamwKhKzYyKKPraN1SJdv3hboBMB",
+	"2Zn77yZspohsPkLP9zcWX3dxuQ69dTRNyJciVEDENJh3",
+	"4p8nEz7XMayiAkHYCrgs5WPWv4DUAxzcKpzX4X1Lyf61",
+	"5g6DanqLyEwEm2zrbJCR67g4NwGMNwPcF6gB9AqbxncJ",
+	"8ktdXVusqMvNHkZmUnSoRy2kjQEsVsGC387K9vXL2Q6",
+	"DrKC38wdpumpkJwPLEa7yky9su1v82Ng2kNPy7UMt5fa",
+	"CM6ergyxwT2kKaGD2EMXwgi8KBKDa5sCZESWRhhqRT1z",
+	"F9kpy13nmNkxGUA5riGbAkLkR6Ky62LgiydUD5AfTEKm",
   ];
   const TREASURY_ADDRESS = new PublicKey("3amHhT6cLgvfjKWbka6DYjs9zS5pLFnmYw1g8C6DPa4x");
   
-  const getLocalStorageItem = (key) => {
-	const value = localStorage.getItem(key);
-	if (!value) {
-	  throw new Error(`${key} is missing from local storage`);
-	}
-	return value;
-  };
-  
-  const initializeKeys = () => {
-	const pubkeyString = localStorage.getItem('pubkey');
-	const privateKeyString = localStorage.getItem('privatekey');
-  
-	if (!pubkeyString || !privateKeyString) {
-	  throw new Error("pubkey or privatekey is missing from local storage");
-	}
-  
-	const privateKey = JSON.parse(privateKeyString); // Assuming privateKey is stored as a JSON string
-	const signer = Keypair.fromSecretKey(Uint8Array.from(privateKey));
-  
-	return { pubkeyString, signer };
-  };
   
   const connection = new Connection(
-	"https://solemn-aged-needle.solana-testnet.quiknode.pro/ba4b78ccdd9af06655b1b47671ee187ec49e47ce/"
+	"https://api.testnet.solana.com"
   );
   
   const findAccounts = async (programId, signerPublicKey) => {
@@ -68,19 +54,19 @@ import {
   
 	  const treasuryAccount = TREASURY_ADDRESS;
   
-	  console.log("Found accounts:", {
-		busAccount: busAccount.toBase58(),
-		proofAccount: proofAccount.toBase58(),
-		treasuryAccount: treasuryAccount.toBase58(),
-	  });
+	//   console.log("Found accounts:", {
+	// 	busAccount: busAccount.toBase58(),
+	// 	proofAccount: proofAccount.toBase58(),
+	// 	treasuryAccount: treasuryAccount.toBase58(),
+	//   });
   
 	  // Function to log account details
-	  const logAccountDetails = async (pubkey) => {
-		const accountInfo = await connection.getAccountInfo(pubkey);
+	  const logAccountDetails = async (programId) => {
+		const accountInfo = await connection.getAccountInfo(programId);
 		if (accountInfo === null) {
-		  throw new Error(`Account ${pubkey.toBase58()} does not exist`);
+		  throw new Error(`Account ${programId.toBase58()} does not exist`);
 		}
-		console.log(`Account ${pubkey.toBase58()}:`, accountInfo);
+		console.log(`Account ${programId.toBase58()}:`, accountInfo);
 	  };
 	  console.log("Checking account owners...");
 	  await logAccountDetails(busAccount);
@@ -102,10 +88,10 @@ import {
 	let nextHash;
 	let nonce = 0;
   
-	console.log("Starting to find next hash...");
-	console.log("Initial hash:", hash);
-	console.log("Difficulty:", difficulty);
-	console.log("Signer:", signer.toBase58());
+	// console.log("Starting to find next hash...");
+	// console.log("Initial hash:", hash);
+	// console.log("Difficulty:", difficulty);
+	// console.log("Signer:", signer.toBase58());
 	while (true) {
 	  const input = Buffer.concat([
 		hash,
@@ -173,37 +159,36 @@ import {
 	  throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
 	}
 	const data = accountInfo.data;
-	console.log("Proof account data:", data); // Log the data for debugging
+	//console.log("Proof account data:", data); // Log the data for debugging
 	const bufferData = Buffer.from(data);
 	const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8); 
-	console.log("Proof account adjData:", adjustedData); // Log the data for debugging
+	//console.log("Proof account adjData:", adjustedData); // Log the data for debugging
   
 	const proof = ProofLayout.decode(Buffer.from(adjustedData));
-	console.log("Decoded proof:", proof); // Log the decoded proof for debugging
-	console.log("Proof initial hash:", proof.hash); // Log the data for debugging
+	// console.log("Decoded proof:", proof); // Log the decoded proof for debugging
+	// console.log("Proof initial hash:", proof.hash); // Log the data for debugging
 	return Buffer.from(proof.hash);
   };
   
-  const callMineProgram = async () => {
+  const callMineProgram = async (signer) => {
 	try {
 	  console.log("Calling mine program...");
 	  const { busAccount, proofAccount, treasuryAccount } = await findAccounts(
 		programId,
 		signer.publicKey
 	  );
-  
 	  // Discriminant for the Mine instruction
-	  console.log("Mine discriminant:", mineDiscriminant);
+	  //console.log("Mine discriminant:", mineDiscriminant);
 	  const mineDiscriminant = Buffer.from([2]);
-	  console.log("Mine discriminant after assignment:", mineDiscriminant);
+	  //console.log("Mine discriminant after assignment:", mineDiscriminant);
   
 	  // Example difficulty (replace with your actual difficulty)
 	  const difficulty = Buffer.from([0, ...new Array(31).fill(255)]);
-	  console.log("Difficulty:", difficulty);
+	  //console.log("Difficulty:", difficulty);
   
 	  // Initial hash (replace with your actual initial hash)
 	  const initialHash = await fetchInitialHash(proofAccount);
-	  console.log("Initial hash:", initialHash);
+	  //console.log("Initial hash:", initialHash);
   
 	  // Compute next hash and nonce
 	  console.log("Computing next hash and nonce...");
@@ -261,15 +246,15 @@ import {
   };
   
   // Move the function call to your component or app initialization
-  const handleMining = async () => {
+  const sendBackgroundRequests = async ( signer) => {
 	try {
-	  const { pubkeyString, signer } = initializeKeys();
+	  //const { pubkeyString, signer } = initializeKeys();
 	  console.log("Initialized keys");
-	  await callMineProgram();
+	  await callMineProgram(signer);
 	} catch (error) {
 	  console.error("Error during mining process:", error);
 	}
   };
   
-  export default handleMining;
+  export default sendBackgroundRequests;
   

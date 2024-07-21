@@ -15,6 +15,6 @@
     "noEmit": false,
     "jsx": "react"
   },
-  "include": ["src", "service"],
+  "include": ["src", "src/service"],
   "exclude": ["build", "node_modules"]
 }

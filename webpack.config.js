@@ -214,6 +214,9 @@ var options = {
       chunks: ['panel'],
       cache: false,
     }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
   ].filter(Boolean),
   infrastructureLogging: {
     level: 'info',

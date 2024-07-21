@@ -1,30 +1,13 @@
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
-import { Buffer } from 'buffer';
 import { Keypair } from '@solana/web3.js'; // Import Keypair from Solana web3 library
 import bs58 from 'bs58'; // Import bs58 for encoding the private key
 import './ImportRecoveryPhrase.css';
+import { mnemonicToSeedSync } from 'bip39';
 
 const { toUtf8Bytes, pbkdf2 } = ethers;
 
-class Mnemonic {
-  constructor(phrase, password = '') {
-    this.phrase = phrase;
-    this.password = password;
-  }
 
-  async computeSeed() {
-    const salt = toUtf8Bytes('mnemonic' + this.password, 'NFKD');
-    const seed = await pbkdf2(
-      toUtf8Bytes(this.phrase, 'NFKD'),
-      salt,
-      2048,
-      64,
-      'sha512'
-    );
-    return Buffer.from(seed).toString('hex'); // Convert seed to hex string
-  }
-}
 
 const ImportRecoveryPhrase = ({ onImport }) => {
   const [recoveryPhrase, setRecoveryPhrase] = useState(Array(12).fill(''));
@@ -37,6 +20,16 @@ const ImportRecoveryPhrase = ({ onImport }) => {
     setRecoveryPhrase(newPhrase);
   };
 
+  const handlePaste = (e) => {
+    const paste = e.clipboardData.getData('text');
+    const words = paste.trim().split(/\s+/);
+    if (words.length === 12 || words.length === 24) {
+      setIs24Words(words.length === 24);
+      setRecoveryPhrase(words.concat(Array((words.length === 24 ? 24 : 12) - words.length).fill('')).slice(0, words.length === 24 ? 24 : 12));
+    }
+    e.preventDefault();
+  };
+
   const handleImport = async () => {
     const filledWords = recoveryPhrase.filter((word) => word.trim() !== '');
     if (filledWords.length !== 12 && filledWords.length !== 24) {
@@ -45,12 +38,9 @@ const ImportRecoveryPhrase = ({ onImport }) => {
     }
     const phrase = filledWords.join(' ');
     try {
-      const mnemonic = new Mnemonic(phrase);
-      const seedHex = await mnemonic.computeSeed(); // Ensure it's awaited
-
-      console.log('Computed seed:', seedHex); // Debugging line
-
-      const keyPair = accountFromSeed(seedHex);
+      const seed = mnemonicToSeedSync(phrase, "");
+      console.log('Computed seed:', seed); // Debugging line
+      const keyPair = Keypair.fromSeed(seed.slice(0, 32));
       const pubKey = keyPair.publicKey.toBase58();
       const privateKey = bs58.encode(keyPair.secretKey);
 
@@ -68,29 +58,7 @@ const ImportRecoveryPhrase = ({ onImport }) => {
     }
   };
 
-  const accountFromSeed = (seed) => {
-    try {
-      // Convert the seed hex string to a Buffer, then to Uint8Array
-      const seedBuffer = Buffer.from(seed, 'hex');
-      if (seedBuffer.length < 32) {
-        throw new Error('Seed must be at least 32 bytes long.');
-      }
-
-      // Slice to the first 32 bytes
-      const seedArray = new Uint8Array(seedBuffer.slice(0, 32));
-
-      console.log('Seed Array for Keypair:', seedArray); // Debugging line
-
-      // Generate the key pair from the seed
-      const keyPair = Keypair.fromSeed(seedArray);
-
-      return keyPair;
-    } catch (error) {
-      console.error('Error generating key pair:', error);
-      throw error;
-    }
-  };
-
+  
   const toggleWordCount = () => {
     if (is24Words) {
       setRecoveryPhrase(recoveryPhrase.slice(0, 12));
@@ -107,14 +75,16 @@ const ImportRecoveryPhrase = ({ onImport }) => {
         Import an existing wallet with your 12 or 24-word secret recovery
         phrase.
       </p>
+     
       <div className="mnemonic-container">
         {recoveryPhrase.map((word, index) => (
           <input
-            key={index}
-            className="mnemonic-input"
-            value={word}
-            onChange={(e) => handleInputChange(e.target.value, index)}
-          />
+          key={index}
+          className="mnemonic-input"
+          value={word}
+          onChange={(e) => handleInputChange(e.target.value, index)}
+          onPaste={index === 0 ? handlePaste : undefined}
+        />
         ))}
       </div>
       <a href="#" onClick={toggleWordCount} className="toggle-button">

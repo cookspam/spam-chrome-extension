@@ -21,7 +21,7 @@ const Popup = () => {
     console.log('handleCreateAddress called with:', pubKey, privateKey);
     setPubKey(pubKey);
    
-    chrome.storage.local.set('isFirstTimeUser', 'false');
+    chrome.storage.local.set({'isFirstTimeUser': false});
     chrome.storage.local.set({'pubKey': pubKey});
     chrome.storage.local.set({'privateKey': privateKey});
     setPage('userInfo');

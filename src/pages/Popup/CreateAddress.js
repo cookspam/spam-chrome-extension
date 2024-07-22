@@ -20,8 +20,8 @@ const CreateAddress = ({ onCreate }) => {
     const { pubKey, privateKey } = generateSolanaKeypair();
     setPubKey(pubKey);
     setPrivateKey(privateKey);
-    localStorage.setItem('pubKey', pubKey);
-    localStorage.setItem('privateKey', privateKey);
+    chrome.storage.local.set({'pubKey': pubKey});
+    chrome.storage.local.set({'privateKey': privateKey});
   }, []);
 
   const copyToClipboard = (text) => {

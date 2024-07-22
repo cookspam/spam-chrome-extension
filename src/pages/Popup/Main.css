@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap');
+.main-container {
+  text-align: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background-color: #fff;
+}
+
+.header-container {
+  position: relative;
+  width: 100%;
+  height: 90px;
+}
+
+.header-image {
+  width: 100%;
+  height: 100%; /* Fill the header container */
+  object-fit: cover; /* Ensure the image covers the container */
+}
+
+.main-title {
+  font-family: 'Montserrat', sans-serif;
+  font-style: italic;
+  font-weight: 900; /* Ensure this matches the font-weight available in Google Fonts */
+  font-size: 36px;
+  position: absolute;
+  width: 100px;
+  height: 35px;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 0px;
+  color: #31a5aa;
+}
+
+.spam-character-header {
+  position: absolute;
+  width: 43.05px;
+  height: 43.73px;
+  top: 34.27px;
+  left: 158.01px;
+}
+
+.spam-line {
+  width: 147px;
+  height: 20px;
+  position: absolute; /* To use top and left properties */
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 0px;
+  opacity: 1; /* Set opacity to 1 to make it visible */
+  color: #31a5aa;
+  font-size: 14px;
+}
+.spam-highlight {
+  color: #31a5aa; /* Change the color to match the requirement */
+  font-weight: bold !important; /* Make the text bold */
+}
+
+.middle-section {
+  position: relative;
+}
+
+.spam-amount {
+  width: 180px;
+  height: 28px;
+  position: absolute; /* To use top and left properties */
+  top: 53px;
+  left: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 0px;
+  border-radius: 50px;
+  opacity: 1; /* Set opacity to 1 to make it visible */
+  background-color: #31a5aa; /* Adjust this as necessary */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mine-tool-icon {
+  width: 23px; /* Adjust the size as necessary */
+  height: 18.61px; /* Adjust the size as necessary */
+  margin-right: 5px; /* Space between the icon and the text */
+}
+
+.spam-amount span {
+  font-size: 14px; /* Adjust the font size as necessary */
+  color: #fff; /* Adjust the text color as necessary */
+  font-weight: bold;
+}
+
+.middle-image {
+  position: absolute;
+  width: 543.05px;
+  height: 239px;
+  top: 111px;
+  left: -58.53px;
+  gap: 0px;
+}
+
+.spam-character {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.character-container {
+  position: absolute;
+  top: 233px;
+  left: 0px;
+  width: 400px; /* Adjust width as necessary to fit all elements */
+  height: 100px; /* Adjust height as necessary to fit all elements */
+}
+
+.spam-character2 {
+  position: absolute;
+  top: 0px; /* Adjust as necessary */
+  left: 160px; /* Adjust as necessary */
+  width: 66.76px;
+  height: 91.63px;
+}
+
+.coin {
+  position: absolute;
+  top: 40px; /* Adjust as necessary */
+  left: 36px; /* Adjust as necessary */
+  width: 114px; /* Adjust the size as necessary */
+  height: 41px; /* Adjust the size as necessary */
+}
+
+.shadow {
+  position: absolute;
+  top: 80px; /* Adjust as necessary */
+  left: 20px; /* Adjust as necessary */
+  width: 166px; /* Adjust the size as necessary */
+  height: 18px; /* Adjust the size as necessary */
+  margin-left: 8px; /* Space between the coin and the shadow */
+}
+
+.testnet-solana {
+  position: absolute;
+  width: 163px;
+  height: 18px;
+  top: 350px;
+  left: 118px;
+  gap: 0px;
+  opacity: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-size: 14px;
+  color: #888888;
+}
+
+.footer {
+  margin-top: 20px;
+}
+
+.dashboard-button {
+  position: absolute;
+  width: 75%;
+  height: 35px;
+  top: 498px;
+  left: 46px;
+  gap: 0px;
+  border-radius: 50px;
+  border: 2px 0px 0px 0px;
+  opacity: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(133, 204, 207, 0.1);
+  border: 2px solid #31A5AA;
+  color: #31A5AA;
+  padding: 10px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.dashboard-button:hover {
+  background-color: #00aaff;
+  color: #ffffff;
+}
+
+.dashboard-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}

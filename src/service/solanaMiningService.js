@@ -41,7 +41,9 @@ import {
   const connection = new Connection(
 	"https://api.testnet.solana.com"
   );
-  
+  ///proofAccount.claimable_rewards ->component/balance.rs
+  // balance: pub fn use_ore_balance_user-> hooks/use_ore_balance.rs
+
   const findAccounts = async (programId, signerPublicKey) => {
 	try {
 	  const busAccount = new PublicKey(BUS_ADDRESSES[0]); // Use the first bus address for this example
@@ -53,12 +55,6 @@ import {
 	  );
   
 	  const treasuryAccount = TREASURY_ADDRESS;
-  
-	//   console.log("Found accounts:", {
-	// 	busAccount: busAccount.toBase58(),
-	// 	proofAccount: proofAccount.toBase58(),
-	// 	treasuryAccount: treasuryAccount.toBase58(),
-	//   });
   
 	  // Function to log account details
 	  const logAccountDetails = async (programId) => {

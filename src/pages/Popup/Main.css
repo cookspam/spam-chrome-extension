@@ -53,7 +53,7 @@
   gap: 0px;
   opacity: 1; /* Set opacity to 1 to make it visible */
   color: #31a5aa;
-  font-size: 14px;
+  font-size: 15px;
 }
 .spam-highlight {
   color: #31a5aa; /* Change the color to match the requirement */
@@ -68,7 +68,7 @@
   width: 180px;
   height: 28px;
   position: absolute; /* To use top and left properties */
-  top: 53px;
+  top: 58px;
   left: 100px;
   left: 50%;
   transform: translateX(-50%);
@@ -153,7 +153,7 @@
   transform: translateX(-50%);
 
   font-size: 14px;
-  color: #888888;
+  color: #31A5AA;
 }
 
 .footer {
@@ -184,10 +184,12 @@
   font-size: 16px;
   cursor: pointer;
 }
-
 .dashboard-button:hover {
-  background-color: #00aaff;
+  background-color: #31a5aa;
   color: #ffffff;
+}
+.dashboard-button:hover .dashboard-icon {
+  filter: brightness(0) invert(1);
 }
 
 .dashboard-icon {

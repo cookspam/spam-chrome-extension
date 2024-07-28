@@ -131,6 +131,10 @@ var options = {
     extensions: fileExtensions
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
+      fallback: {
+        
+        "buffer": require.resolve("buffer/")
+    }
   },
   plugins: [
     isDevelopment && new ReactRefreshWebpackPlugin(),

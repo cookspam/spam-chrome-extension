@@ -7,6 +7,9 @@
   "permissions": [
     "storage"
   ],
+  "host_permissions": [
+    "https://*/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "spam_character1.png"

@@ -43,6 +43,7 @@
 	border-radius: 25px;
 	cursor: pointer;
 	width: 280px;
+	font-weight: bold;
   }
   
   .home-button:hover {

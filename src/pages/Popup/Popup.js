@@ -8,10 +8,24 @@ import ImportPrivateKey from './ImportPrivateKey';
 import ImportSuccess from './ImportSuccess';
 import UserInfo from './Main';
 
+
 const Popup = () => {
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true);
   const [page, setPage] = useState('onboarding');
   const [pubKey, setPubKey] = useState('');
+
+  useEffect(() => {
+    chrome.storage.local.get(['isFirstTimeUser', 'pubKey'], (result) => {
+      if (result.isFirstTimeUser === false && result.pubKey) {
+        setPubKey(result.pubKey);
+        setPage('userInfo');
+      } else {
+        setIsFirstTimeUser(true);
+        setPage('onboarding');
+      }
+    });
+  }, []);
+
 
   useEffect(() => {
     console.log('Current page:', page);
@@ -20,7 +34,6 @@ const Popup = () => {
   const handleCreateAddress = async (pubKey, privateKey) => {
     console.log('handleCreateAddress called with:', pubKey, privateKey);
     setPubKey(pubKey);
-   
     chrome.storage.local.set({'isFirstTimeUser': false});
     chrome.storage.local.set({'pubKey': pubKey});
     chrome.storage.local.set({'privateKey': privateKey});

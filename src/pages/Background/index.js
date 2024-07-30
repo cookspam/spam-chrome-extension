@@ -52,9 +52,15 @@ const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey(
   'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
 ); //given
 
-const connection = new Connection(
-  'https://api.testnet.solana.com'
-);
+let connection;
+
+const initializeConnection = async () => {
+  const storedRpcUrl = await chrome.storage.local.get('rpcUrl');
+  const rpcUrl = storedRpcUrl.rpcUrl || 'https://api.testnet.solana.com';
+  console.log("RPCCCCC",rpcUrl)
+  connection = new Connection(rpcUrl);
+};
+initializeConnection();
 ///proofAccount.claimable_rewards ->component/balance.rs
 // balance: pub fn use_ore_balance_user-> hooks/use_ore_balance.rs
 

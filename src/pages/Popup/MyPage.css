@@ -86,6 +86,27 @@ text-align: center;
 	font-weight: 700;
 	
   }
+
+  .readonly-text {
+	flex: 1;
+	padding: 10px;
+	background-color: #444;
+	border-radius: 4px;
+	color: white;
+	word-break: break-all;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: relative;
+  }
+  
+  .copy-icon, .close-icon {
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+	margin-left: 5px;
+  }
+  
   
   .back-button {
 	display: block;
@@ -117,25 +138,7 @@ text-align: center;
 	color: white;
   }
   
-  .readonly-text {
-	flex: 1;
-  padding: 10px;
-  background-color: #444;
-  border-radius: 4px;
-  color: white;
-  margin-right: 10px;
-  word-break: break-all;
-  display: flex;
-  align-items: center;
-  font-size: 11px;
-  }
-  .copy-icon {
-	margin-left: 3px;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  vertical-align: middle;
-  }
+ 
   .label {
 	padding-bottom: 6px;
 	padding-top: 10px;

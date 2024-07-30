@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getSolanaBalance, getSpamBalance } from '../Background/index'; 
 import copyIcon from '../../assets/img/copy.png';
 import homeIcon from '../../assets/img/home.png';
+import closeIcon from '../../assets/img/check.png';
 import './MyPage.css';
+
+const defaultRpcUrl = 'https://api.testnet.solana.com';
 
 const MyPage = ({ pubKey, setPage }) => {
   const [explorer, setExplorer] = useState('Solana Explorer');
@@ -18,8 +21,11 @@ const MyPage = ({ pubKey, setPage }) => {
 
   useEffect(() => {
     const fetchKeysAndBalances = async () => {
+      const storedPubKey = await chrome.storage.local.get('pubKey');
       const storedPrivateKey = await chrome.storage.local.get('privateKey');
+      const storedRpcUrl = await chrome.storage.local.get('rpcUrl');
       if (storedPrivateKey.privateKey) setPrivateKey(storedPrivateKey.privateKey);
+      if (storedRpcUrl.rpcUrl) setRpcUrl(storedRpcUrl.rpcUrl);
       if (pubKey) {
         const solBalance = await getSolanaBalance(pubKey);
         setSolanaBalance(parseFloat(solBalance).toFixed(2));
@@ -30,8 +36,14 @@ const MyPage = ({ pubKey, setPage }) => {
     fetchKeysAndBalances();
   }, [pubKey]);
 
+  useEffect(() => {
+    setTempRpcUrl(rpcUrl);
+  }, [rpcUrl]);
+
   const handleSaveRpc = () => {
-    setRpcUrl(tempRpcUrl);
+    const finalRpcUrl = tempRpcUrl.trim() === '' ? defaultRpcUrl : tempRpcUrl;
+    setRpcUrl(finalRpcUrl);
+    chrome.storage.local.set({ rpcUrl: finalRpcUrl });
     setIsFocused(false);
   };
 
@@ -68,6 +80,12 @@ const MyPage = ({ pubKey, setPage }) => {
     }
   };
 
+  const copyPrivateKeyAndClose = () => {
+    navigator.clipboard.writeText(privateKey);
+    setExportModalVisible(false);
+  };
+  
+
   return (
     <div className="my-page-container">
       <h2 className="page-title">My Page</h2>
@@ -96,6 +114,28 @@ const MyPage = ({ pubKey, setPage }) => {
           <button onClick={() => setImportModalVisible(true)}>Import</button>
           <button onClick={handleExport}>Export</button>
         </div>
+        {isExportModalVisible && (
+  <div className="export-modal">
+    <h3>Your Private Key</h3>
+    <div className="readonly-text">
+      {privateKey}
+      <img
+        src={copyIcon}
+        className="copy-icon"
+        alt="Copy"
+        onClick={() => navigator.clipboard.writeText(privateKey)}
+      />
+      <img
+        src={closeIcon}
+        className="close-icon"
+        alt="Close"
+        onClick={() => setExportModalVisible(false)}
+      />
+    </div>
+  </div>
+)}
+
+
       </div>
       <div className="section">
         <h3>Display</h3>
@@ -121,8 +161,8 @@ const MyPage = ({ pubKey, setPage }) => {
         </div>
       </div>
       <button className="back-button" onClick={() => setPage('userInfo')}>
-  <img src={homeIcon} className="back-icon" alt="Back" />
-</button>
+        <img src={homeIcon} className="back-icon" alt="Back" />
+      </button>
 
     </div>
   );

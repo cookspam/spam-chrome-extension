@@ -53,7 +53,7 @@ const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey(
 ); //given
 
 const connection = new Connection(
-  'https://capable-icy-star.solana-testnet.quiknode.pro/02604b029a8773c1ebc9e1933bdff5800f18e986'
+  'https://api.testnet.solana.com'
 );
 ///proofAccount.claimable_rewards ->component/balance.rs
 // balance: pub fn use_ore_balance_user-> hooks/use_ore_balance.rs

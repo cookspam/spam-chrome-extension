@@ -7,7 +7,7 @@ import ImportRecoveryPhrase from './ImportRecoveryPhrase';
 import ImportPrivateKey from './ImportPrivateKey';
 import ImportSuccess from './ImportSuccess';
 import UserInfo from './Main';
-
+import MyPage from './MyPage'; 
 
 const Popup = () => {
   const [isFirstTimeUser, setIsFirstTimeUser] = useState(true);
@@ -83,7 +83,10 @@ const Popup = () => {
         );
       case 'userInfo':
         console.log('Rendering UserInfo with pubKey:', pubKey);
-        return <UserInfo pubKey={pubKey} />;
+        return <UserInfo pubKey={pubKey} setPage={setPage} />;
+      case 'mypage': // Add case for MyPage
+        console.log('Rendering MyPage component');
+        return <MyPage pubKey={pubKey} setPage={setPage} />;
       default:
         return <Onboarding />;
     }

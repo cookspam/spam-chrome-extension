@@ -197,3 +197,44 @@
   height: 20px;
   margin-right: 10px;
 }
+/* src/pages/Popup/Main.css */
+
+.settings-button {
+  position: absolute;
+  width: 75%;
+  height: 35px;
+  top: 540px;
+  left: 46px;
+  gap: 0px;
+  border-radius: 50px;
+  border: 2px 0px 0px 0px;
+  opacity: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(133, 204, 207, 0.1);
+  border: 2px solid #31A5AA;
+  color: #31A5AA;
+  padding: 10px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.settings-button:hover {
+  background-color: #31a5aa;
+  color: #ffffff;
+}
+
+.setting-button:hover .setting-icon {
+  filter: brightness(0) invert(1);
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px; 
+}

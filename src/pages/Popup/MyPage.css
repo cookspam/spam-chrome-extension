@@ -1,0 +1,142 @@
+* {
+	box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+  }
+  
+  html, body {
+	margin: 0;
+	padding: 0;
+  }
+  
+  .my-page-container {
+	padding: 20px 20px;
+	background-color: #222;
+	color: white;
+	font-family: Arial, sans-serif;
+	width: 100%
+  }
+  
+  .page-title {
+	text-align: center;
+	color: #27CDD0;
+font-size: 20px;
+font-weight: 700;
+line-height: 23.87px;
+text-align: center;
+
+  }
+  
+  .section {
+	margin-bottom: 20px;
+	background-color: #333;
+	padding: 15px 12px;
+	border-radius: 8px;
+	text-align: left; /* Ensure the section headers are left-aligned */
+  }
+  
+  .section h3 {
+	color: #27CDD0;
+  }
+  
+  .input-group {
+	display: flex;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+  }
+  
+  .input-group input {
+	flex: 1;
+	padding: 10px;
+	margin-right: 10px;
+	border-radius: 4px;
+	border: none;
+	background-color: #444;
+	color: white;
+	
+  }
+  
+  .input-group button {
+	
+	padding: 9px;
+	border: none;
+	border-radius: 25px;
+	cursor: pointer;
+	background-color: #27CDD0;
+	color: #222222;
+	font-size: 10px;
+	font-weight: 700;
+  }
+  
+  
+  .keypair-buttons {
+	display: flex;
+	justify-content: flex-end;
+  }
+  
+  .keypair-buttons button {
+	
+	margin: 5px;
+	padding: 7px;
+	border: none;
+	border-radius: 25px;
+	cursor: pointer;
+	background-color: #27CDD0;
+	color: #222222;
+	font-size: 10px;
+	font-weight: 700;
+	
+  }
+  
+  .back-button {
+	display: block;
+	margin: 0 auto;
+	padding: 5px;
+	border: none;
+	border-radius: 50%;
+
+	cursor: pointer;
+	width: 30px; /* Adjust the size as needed */
+	height: 30px; /* Adjust the size as needed */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+  }
+  
+  .back-icon {
+	width: 20px; /* Adjust the size as needed */
+	height: 20px; /* Adjust the size as needed */
+  }
+  
+  
+  select {
+	width: 100%;
+	padding: 10px;
+	border-radius: 4px;
+	border: none;
+	background-color: #444;
+	color: white;
+  }
+  
+  .readonly-text {
+	flex: 1;
+  padding: 10px;
+  background-color: #444;
+  border-radius: 4px;
+  color: white;
+  margin-right: 10px;
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  }
+  .copy-icon {
+	margin-left: 3px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  vertical-align: middle;
+  }
+  .label {
+	padding-bottom: 6px;
+	padding-top: 10px;
+  }

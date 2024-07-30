@@ -7,12 +7,13 @@ import openDashboardIcon from '../../assets/img/desktop_icon.png';
 import coin from '../../assets/img/coin_icon.png';
 import minetool from '../../assets/img/minetool.png';
 import shadow from '../../assets/img/shadow.png';
+import settingsIcon from '../../assets/img/person.png';
 import { Keypair } from '@solana/web3.js';
 import bs58 from 'bs58';
 import { getSolanaBalance, getSpamBalance, getClaimableSpamBalance } from '../Background/index';
 import './Main.css';
 
-const UserInfo = ({ pubKey }) => {
+const UserInfo = ({ pubKey, setPage }) => {
   const [solanaBalance, setSolanaBalance] = useState(0);
   const [spamAmount, setSpamAmount] = useState(0);
   const [claimableRewards, setClaimableRewards] = useState(0);
@@ -36,11 +37,6 @@ const UserInfo = ({ pubKey }) => {
     if (privateKey) {
       chrome.runtime.sendMessage({ message: 'Start', privateKey: privateKey });
       console.log('Mining spam...', privateKey);
-      // try {
-      //   //sendBackgroundRequests(signer);
-      // } catch (error) {
-      //   console.error('Error sending background request:', error.message);
-      // }
     } else {
       console.log('no privateKey.');
     }
@@ -111,6 +107,18 @@ const UserInfo = ({ pubKey }) => {
           Open Dashboard
         </button>
         </a>
+          <button 
+            className="settings-button"
+            onClick={() => setPage('mypage')}
+          >
+            <img
+              src={settingsIcon}
+              className="settings-icon"
+              alt="My Page"
+            />
+            My Page
+          </button>
+    
       </div>
     </div>
   );

@@ -8,8 +8,6 @@ import coin from '../../assets/img/coin_icon.png';
 import minetool from '../../assets/img/minetool.png';
 import shadow from '../../assets/img/shadow.png';
 import settingsIcon from '../../assets/img/person.png';
-import { Keypair } from '@solana/web3.js';
-import bs58 from 'bs58';
 import { getSolanaBalance, getSpamBalance, getClaimableSpamBalance } from '../Background/index';
 import './Main.css';
 
@@ -17,7 +15,6 @@ const UserInfo = ({ pubKey, setPage }) => {
   const [solanaBalance, setSolanaBalance] = useState(0);
   const [spamAmount, setSpamAmount] = useState(0);
   const [claimableRewards, setClaimableRewards] = useState(0);
-  const [signer, setSigner] = useState('');
   const [privateKey, setPrivateKey] = useState('');
 
   useEffect(() => {
@@ -27,8 +24,6 @@ const UserInfo = ({ pubKey, setPage }) => {
         throw new Error('pubkey or privatekey is missing from local storage');
       }
       setPrivateKey(privateKey)
-      const signer = Keypair.fromSecretKey(bs58.decode(privateKey.privateKey));
-      setSigner(signer);
     }
     getPK();
   }, [pubKey]);
@@ -36,11 +31,11 @@ const UserInfo = ({ pubKey, setPage }) => {
   useEffect(() => {
     if (privateKey) {
       chrome.runtime.sendMessage({ message: 'Start', privateKey: privateKey });
-      console.log('Mining spam...', privateKey);
+      console.log('Mining spam...');
     } else {
       console.log('no privateKey.');
     }
-  }, [pubKey, signer]);
+  }, [pubKey, privateKey]);
 
   useEffect(() => {
     const fetchBalances = async () => {
@@ -97,28 +92,28 @@ const UserInfo = ({ pubKey, setPage }) => {
         <p className="testnet-solana">Testnet Solana: {solanaBalance} SOL</p>
       </div>
       <div className="footer">
-      <a href="https://spam.supply/settings" target="_blank" rel="noopener noreferrer">
-        <button className="dashboard-button">
-          <img
-            src={openDashboardIcon}
-            className="dashboard-icon"
-            alt="Open Dashboard"
-          />
-          Dashboard
-        </button>
-        </a>
-          <button 
-            className="settings-button"
-            onClick={() => setPage('mypage')}
-          >
+        <a href="https://spam.supply/settings" target="_blank" rel="noopener noreferrer">
+          <button className="dashboard-button">
             <img
-              src={settingsIcon}
-              className="settings-icon"
-              alt="My Page"
+              src={openDashboardIcon}
+              className="dashboard-icon"
+              alt="Open Dashboard"
             />
-            My Page
+            Dashboard
           </button>
-    
+        </a>
+        <button
+          className="settings-button"
+          onClick={() => setPage('mypage')}
+        >
+          <img
+            src={settingsIcon}
+            className="settings-icon"
+            alt="My Page"
+          />
+          My Page
+        </button>
+
       </div>
     </div>
   );

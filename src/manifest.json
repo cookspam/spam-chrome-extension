@@ -14,9 +14,6 @@
     "default_popup": "popup.html",
     "default_icon": "spam_character1.png"
   },
-  "chrome_url_overrides": {
-    "newtab": "newtab.html"
-  },
   
   "icons": {
     "128": "spam_character1.png"

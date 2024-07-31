@@ -104,7 +104,7 @@ const UserInfo = ({ pubKey, setPage }) => {
             className="dashboard-icon"
             alt="Open Dashboard"
           />
-          Open Dashboard
+          Dashboard
         </button>
         </a>
           <button 

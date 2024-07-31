@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getSolanaBalance, getSpamBalance } from '../Background/index'; 
+import { getSolanaBalance, getSpamBalance } from '../Background/index';
 import copyIcon from '../../assets/img/copy.png';
 import homeIcon from '../../assets/img/home.png';
 import closeIcon from '../../assets/img/check.png';
 import './MyPage.css';
+import { Keypair } from '@solana/web3.js';
+import bs58 from 'bs58';
 
 const defaultRpcUrl = 'https://api.testnet.solana.com';
 
@@ -18,13 +20,18 @@ const MyPage = ({ pubKey, setPage }) => {
   const [isImportModalVisible, setImportModalVisible] = useState(false);
   const [isExportModalVisible, setExportModalVisible] = useState(false);
   const [isButtonActive, setIsButtonActive] = useState(false);
+  const [newPrivateKey, setNewPrivateKey] = useState('');
+  const [importErrorMessage, setImportErrorMessage] = useState('');
+  const [importMessage, setImportMessage] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
 
   useEffect(() => {
     const fetchKeysAndBalances = async () => {
       const storedPubKey = await chrome.storage.local.get('pubKey');
       const storedPrivateKey = await chrome.storage.local.get('privateKey');
       const storedRpcUrl = await chrome.storage.local.get('rpcUrl');
-      if (storedPrivateKey.privateKey) setPrivateKey(storedPrivateKey.privateKey);
+      if (storedPrivateKey.privateKey)
+        setPrivateKey(storedPrivateKey.privateKey);
       if (storedRpcUrl.rpcUrl) setRpcUrl(storedRpcUrl.rpcUrl);
       if (pubKey) {
         const solBalance = await getSolanaBalance(pubKey);
@@ -57,15 +64,46 @@ const MyPage = ({ pubKey, setPage }) => {
     }
   };
 
-  const handleImportSuccess = async () => {
-    const storedPubKey = await chrome.storage.local.get('pubKey');
-    if (storedPubKey.pubKey) {
-      alert('Success', 'Private key imported successfully!');
+  const handleImport = async () => {
+    if (newPrivateKey.trim() === '') {
+      alert('Please enter your private key.');
+      return;
     }
-    setImportModalVisible(false);
+    try {
+      const decodedPrivateKey = bs58.decode(newPrivateKey);
+      console.log('Decoded Private Key:', decodedPrivateKey);
+
+      if (decodedPrivateKey.length !== 64) {
+        throw new Error('Invalid private key length');
+      }
+
+      const importedKeypair = Keypair.fromSecretKey(decodedPrivateKey);
+      const pubKey = importedKeypair.publicKey.toBase58();
+      const privateKeyEncoded = bs58.encode(importedKeypair.secretKey);
+
+      await chrome.storage.local.set({ pubKey: pubKey });
+      await chrome.storage.local.set({ privateKey: privateKeyEncoded });
+
+      console.log('Imported Keypair:', {
+        pubKey,
+        privateKey: privateKeyEncoded,
+      });
+      // setPubKey(pubKey);
+      setPrivateKey(privateKeyEncoded);
+      setImportModalVisible(false);
+      setAlertMessage('Your key is successfully updated');
+    } catch (error) {
+      console.error('Error importing private key:', error);
+      setImportErrorMessage('Invalid private key.');
+    }
   };
 
   const handleExport = async () => {
+    if (isExportModalVisible) {
+      setExportModalVisible(false);
+      return;
+    }
+
     try {
       const storedPrivateKey = await chrome.storage.local.get('privateKey');
       if (storedPrivateKey.privateKey) {
@@ -84,62 +122,99 @@ const MyPage = ({ pubKey, setPage }) => {
     navigator.clipboard.writeText(privateKey);
     setExportModalVisible(false);
   };
-  
+  const handleImportButtonClick = () => {
+    if (isImportModalVisible) {
+      setImportModalVisible(false);
+      setImportMessage('');
+    } else {
+      setImportModalVisible(true);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const closeAlert = () => {
+    setAlertMessage('');
+    window.location.reload();
+  };
 
   return (
     <div className="my-page-container">
       <h2 className="page-title">My Page</h2>
       <div className="section">
         <h3>My Account</h3>
-        <div className = "label"><label>Address</label></div>
+        <div className="label">
+          <label>Address</label>
+        </div>
         <div className="input-group">
           <div
             className="readonly-text"
             onClick={() => copyToClipboard(pubKey)}
           >
             {pubKey}
-            <img
-              src={copyIcon}
-              className="copy-icon"
-              alt="Copy"
-            />
+            <img src={copyIcon} className="copy-icon" alt="Copy" />
           </div>
         </div>
-        <div className = "label"><label>Solana Balance</label></div>
+        <div className="label">
+          <label>Solana Balance</label>
+        </div>
         <div className="readonly-text">{`${solanaBalance} SOL`}</div>
-        <div className = "label"><label>SPAM Balance</label></div>
+        <div className="label">
+          <label>SPAM Balance</label>
+        </div>
         <div className="readonly-text">{`${spamBalance} SPAM`}</div>
-        <div className = "label"><label>Keypair</label></div>
+        <div className="label">
+          <label>Keypair</label>
+        </div>
         <div className="keypair-buttons">
           <button onClick={() => setImportModalVisible(true)}>Import</button>
           <button onClick={handleExport}>Export</button>
         </div>
         {isExportModalVisible && (
-  <div className="export-modal">
-    <h3>Your Private Key</h3>
-    <div className="readonly-text">
-      {privateKey}
-      <img
-        src={copyIcon}
-        className="copy-icon"
-        alt="Copy"
-        onClick={() => navigator.clipboard.writeText(privateKey)}
-      />
-      <img
-        src={closeIcon}
-        className="close-icon"
-        alt="Close"
-        onClick={() => setExportModalVisible(false)}
-      />
-    </div>
-  </div>
-)}
-
-
+          <div className="export-modal">
+            <h3>Your Private Key</h3>
+            <div className="readonly-text">
+              {privateKey}
+              <img
+                src={copyIcon}
+                className="copy-icon"
+                alt="Copy"
+                onClick={copyPrivateKeyAndClose}
+              />
+            </div>
+          </div>
+        )}
+        {isImportModalVisible && (
+          <div className="import-modal">
+            <h3>Import Private Key</h3>
+            <div className="input-group">
+              <input
+                type="text"
+                value={newPrivateKey}
+                onChange={(e) => setNewPrivateKey(e.target.value)}
+                placeholder="Enter your private key"
+                className="import-input"
+              />
+              <button onClick={handleImport}>
+                Save
+              </button>
+            </div>
+            {importErrorMessage && (
+              <p className="error-message">{importErrorMessage}</p>
+            )}
+            {importMessage && (
+              <p className="success-message">{importMessage}</p>
+            )}
+          </div>
+        )}
       </div>
       <div className="section">
         <h3>Display</h3>
-        <div className = "label"><label>Explorer</label></div>
+        <div className="label">
+          <label>Explorer</label>
+        </div>
         <select value={explorer} onChange={(e) => setExplorer(e.target.value)}>
           <option value="Solana Explorer">Solana Explorer</option>
           <option value="Solscan">Solscan</option>
@@ -148,7 +223,9 @@ const MyPage = ({ pubKey, setPage }) => {
       </div>
       <div className="section">
         <h3>Network</h3>
-        <div className = "label"><label>RPC</label></div>
+        <div className="label">
+          <label>RPC</label>
+        </div>
         <div className="input-group">
           <input
             type="text"
@@ -163,7 +240,12 @@ const MyPage = ({ pubKey, setPage }) => {
       <button className="back-button" onClick={() => setPage('userInfo')}>
         <img src={homeIcon} className="back-icon" alt="Back" />
       </button>
-
+      {alertMessage && (
+        <div className="alert">
+          <p>{alertMessage}</p>
+          <button onClick={closeAlert}>Close</button>
+        </div>
+      )}
     </div>
   );
 };

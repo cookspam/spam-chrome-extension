@@ -155,86 +155,50 @@
   font-size: 14px;
   color: #31A5AA;
 }
-
 .footer {
-  margin-top: 20px;
-}
-
-.dashboard-button {
   position: absolute;
-  width: 75%;
-  height: 35px;
-  top: 498px;
-  left: 46px;
-  gap: 0px;
-  border-radius: 50px;
-  border: 2px 0px 0px 0px;
-  opacity: 0px;
+  top:500px; /* Adjust the distance from the bottom of the page */
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  width: 90%; /* Adjust the width as needed */
+}
+.footer a {
+  text-decoration: none;
+  flex: 1;
+  
+}
+
+.dashboard-button, .settings-button {
+  flex: 1;
+  margin: 0 5px;
+  height: 35px;
+  margin-bottom: 50px;
+  border-radius: 50px;
+  border: 2px solid #31A5AA;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(133, 204, 207, 0.1);
-  border: 2px solid #31A5AA;
   color: #31A5AA;
   padding: 10px 20px;
-  border-radius: 20px;
   text-decoration: none;
   font-size: 16px;
   cursor: pointer;
 }
-.dashboard-button:hover {
+
+.dashboard-button:hover, .settings-button:hover {
   background-color: #31a5aa;
   color: #ffffff;
 }
-.dashboard-button:hover .dashboard-icon {
-  filter: brightness(0) invert(1);
-}
 
-.dashboard-icon {
+.dashboard-icon, .settings-icon {
   width: 20px;
   height: 20px;
   margin-right: 10px;
 }
-/* src/pages/Popup/Main.css */
 
-.settings-button {
-  position: absolute;
-  width: 75%;
-  height: 35px;
-  top: 540px;
-  left: 46px;
-  gap: 0px;
-  border-radius: 50px;
-  border: 2px 0px 0px 0px;
-  opacity: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(133, 204, 207, 0.1);
-  border: 2px solid #31A5AA;
-  color: #31A5AA;
-  padding: 10px 20px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.settings-button:hover {
-  background-color: #31a5aa;
-  color: #ffffff;
-}
-
-.setting-button:hover .setting-icon {
+.dashboard-button:hover .dashboard-icon, .settings-button:hover .settings-icon {
   filter: brightness(0) invert(1);
-}
-
-.settings-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px; 
 }

@@ -58,12 +58,11 @@ let connection;
 const initializeConnection = async () => {
   const storedRpcUrl = await chrome.storage.local.get('rpcUrl');
   const rpcUrl = storedRpcUrl.rpcUrl || 'https://api.testnet.solana.com';
-  console.log('RPCCCCC', rpcUrl);
+  console.log('RPC set', rpcUrl);
   connection = new Connection(rpcUrl, { disableRetryOnRateLimit: false });
 };
 initializeConnection();
-///proofAccount.claimable_rewards ->component/balance.rs
-// balance: pub fn use_ore_balance_user-> hooks/use_ore_balance.rs
+
 
 const getProofAccount = (signerPublicKey) => {
   return PublicKey.findProgramAddressSync(
@@ -95,10 +94,6 @@ async function callRegister(signer) {
   ).blockhash;
 
   try {
-    console.log('Signer public key:', signer.publicKey.toBase58());
-    console.log('Proof account:', proofAccount.toBase58());
-    console.log('System Program ID:', SystemProgram.programId.toBase58());
-    console.log('Program ID:', programId.toBase58());
     const signature = await sendAndConfirmTransaction(connection, transaction, [
       signer,
     ]);
@@ -123,7 +118,6 @@ const findAccounts = async (signerPublicKey, programId) => {
       if (accountInfo === null) {
         throw new Error(`Account ${programId.toBase58()} does not exist`);
       }
-      //console.log(`Account ${programId.toBase58()}:`, accountInfo);
     };
     console.log('Checking account owners...');
     await logAccountDetails(busAccount);
@@ -145,10 +139,6 @@ const findNextHash = (hash, difficulty, signer) => {
   let nextHash;
   let nonce = 0;
 
-  // console.log("Starting to find next hash...");
-  // console.log("Initial hash:", hash);
-  // console.log("Difficulty:", difficulty);
-  // console.log("Signer:", signer.toBase58());
   while (true) {
     const input = Buffer.concat([
       hash,
@@ -179,14 +169,10 @@ const fetchInitialHash = async (proofAccount) => {
     throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
   }
   const data = accountInfo.data;
-  //console.log("Proof account data:", data); // Log the data for debugging
   const bufferData = Buffer.from(data);
   const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8);
-  //console.log("Proof account adjData:", adjustedData); // Log the data for debugging
-
+ 
   const proof = ProofLayout.decode(Buffer.from(adjustedData));
-  // console.log("Decoded proof:", proof); // Log the decoded proof for debugging
-  // console.log("Proof initial hash:", proof.hash); // Log the data for debugging
   return Buffer.from(proof.hash);
 };
 
@@ -202,8 +188,8 @@ const callMineProgram = async (signer) => {
       signer.publicKey,
       programId
     );
+
     // Discriminant for the Mine instruction
-    //console.log("Mine discriminant:", mineDiscriminant);
     const mineDiscriminant = Buffer.from([2]);
     //console.log("Mine discriminant after assignment:", mineDiscriminant);
 
@@ -225,7 +211,7 @@ const callMineProgram = async (signer) => {
 
     // Convert nonce to 8 bytes using bn.js
     const nonceBuffer = new BN(nonce).toArrayLike(Buffer, 'le', 8);
-    console.log('Nonce buffer:', nonceBuffer);
+  //  console.log('Nonce buffer:', nonceBuffer);
 
     // Construct the data for the Mine instruction
     const data = Buffer.concat([mineDiscriminant, nextHash, nonceBuffer]);
@@ -269,7 +255,7 @@ export const getSolanaBalance = async (pubKey) => {
   try {
     const publicKey = new PublicKey(pubKey);
     const balance = await connection.getBalance(publicKey);
-    console.log('get SOL balance', balance);
+   // console.log('get SOL balance', balance);
     return balance / 1e9; // Convert lamports to SOL
   } catch (error) {
     console.error('Error getting Solana balance:', error);
@@ -307,20 +293,20 @@ export const getClaimableSpamBalance = async (pubKey) => {
     console.log('Fetching claimable rewards for:', pubKey); // Debugging line
     const publicKey = new PublicKey(pubKey);
     const [proofAccount] = getProofAccount(publicKey);
-    console.log('Proof account address:', proofAccount.toBase58()); // Debugging line
+   // console.log('Proof account address:', proofAccount.toBase58()); // Debugging line
     const accountInfo = await connection.getAccountInfo(proofAccount);
     if (accountInfo === null) {
       throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
     }
     const data = accountInfo.data;
-    console.log('Proof account data:', data); // Log the data for debugging
+    // console.log('Proof account data:', data); // Log the data for debugging
     const bufferData = Buffer.from(data);
     const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8);
-    console.log('Proof account adjusted data:', adjustedData); // Log the data for debugging
+    // console.log('Proof account adjusted data:', adjustedData); // Log the data for debugging
 
     const proof = ProofLayout.decode(Buffer.from(adjustedData));
-    console.log('Decoded proof:', proof); // Log the decoded proof for debugging
-    console.log('Proof claimable rewards:', proof.claimable_rewards); // Log the data for debugging
+    // console.log('Decoded proof:', proof); // Log the decoded proof for debugging
+    // console.log('Proof claimable rewards:', proof.claimable_rewards); // Log the data for debugging
 
     return proof.claimable_rewards / 1e9;
   } catch (error) {
@@ -354,19 +340,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const signer = Keypair.fromSecretKey(
       bs58.decode(message.privateKey.privateKey)
     );
-    console.log('Signer: ', signer);
-    console.log('Signer.publicKey: ', signer.publicKey);
+    // console.log('Signer: ', signer);
+    // console.log('Signer.publicKey: ', signer.publicKey);
 
     sendRegister(signer);
 
     const mineSpam = () => {
-      //console.log('Mining spam...', message.privateKey);
-      //   const signer = Keypair.fromSecretKey(
-      //     bs58.decode(message.privateKey.privateKey)
-      //   );
-      //   console.log('Signer: ', signer)
-      // console.log('Signer.publicKey: ', signer.publicKey)
-
+      
       try {
         sendBackgroundRequests(signer);
       } catch (error) {

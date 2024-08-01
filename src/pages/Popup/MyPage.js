@@ -19,7 +19,6 @@ const MyPage = ({ pubKey, setPage }) => {
   const [privateKey, setPrivateKey] = useState('');
   const [isImportModalVisible, setImportModalVisible] = useState(false);
   const [isExportModalVisible, setExportModalVisible] = useState(false);
-  const [isButtonActive, setIsButtonActive] = useState(false);
   const [newPrivateKey, setNewPrivateKey] = useState('');
   const [importErrorMessage, setImportErrorMessage] = useState('');
   const [importMessage, setImportMessage] = useState('');

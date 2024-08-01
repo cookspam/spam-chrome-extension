@@ -27,7 +27,6 @@
   font-family: 'Montserrat', sans-serif;
   font-style: italic;
   font-weight: 900;
-  /* Ensure this matches the font-weight available in Google Fonts */
   font-size: 36px;
   position: absolute;
   width: 100px;
@@ -105,18 +104,26 @@
 
 .mine-tool-icon {
   width: 23px;
-  /* Adjust the size as necessary */
   height: 18.61px;
-  /* Adjust the size as necessary */
   margin-right: 5px;
-  /* Space between the icon and the text */
+  animation: blink-animation 1.5s infinite;
+}
+
+@keyframes blink-animation {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .spam-amount span {
   font-size: 14px;
-  /* Adjust the font size as necessary */
   color: #fff;
-  /* Adjust the text color as necessary */
   font-weight: bold;
 }
 
@@ -145,16 +152,6 @@
   overflow: hidden;
 }
 
-/* @keyframes moveRight {
-  0% {
-    transform: translateX(-150%);
-  }
-
-  100% {
-    transform: translateX(150%);
-  }
-} */
-
 @keyframes moveRight {
   0% {
     left: var(--initial-left);
@@ -181,32 +178,19 @@
 .coin {
   position: absolute;
   top: 40px;
-  /* Adjust as necessary */
   left: 36px;
-  /* Adjust as necessary */
-  /* width: 114px; */
-  /* Adjust the size as necessary */
-  /* height: 41px; */
-  /* Adjust the size as necessary */
 }
 
 .shadow {
   position: absolute;
   top: 80px;
-  /* Adjust as necessary */
   left: 20px;
-  /* Adjust as necessary */
-  /* width: 166px; */
-  /* Adjust the size as necessary */
-  /* height: 18px; */
-  /* Adjust the size as necessary */
   margin-left: 8px;
-  /* Space between the coin and the shadow */
 }
 
 .testnet-solana {
   position: absolute;
-  width: 163px;
+  width: 183px;
   height: 18px;
   top: 350px;
   left: 118px;
@@ -214,7 +198,6 @@
   opacity: 1px;
   left: 50%;
   transform: translateX(-50%);
-
   font-size: 14px;
   color: #31a5aa;
 }
@@ -228,7 +211,6 @@
   display: flex;
   justify-content: center;
   width: 90%;
-  /* Adjust the width as needed */
 }
 
 .footer a {

@@ -16,7 +16,8 @@ const Popup = () => {
 
   useEffect(() => {
     chrome.storage.local.get(['isFirstTimeUser', 'pubKey'], (result) => {
-      if (result.isFirstTimeUser === false && result.pubKey) {
+      const { isFirstTimeUser: firstTime, pubKey: storedPubKey } = result;
+      if (!firstTime && storedPubKey) {
         setPubKey(result.pubKey);
         setPage('userInfo');
       } else {

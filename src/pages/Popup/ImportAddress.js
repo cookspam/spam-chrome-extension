@@ -10,13 +10,13 @@ const ImportAddress = ({ onImportRecoveryPhrase, onImportPrivateKey }) => {
 
   const handleImportPrivateKey = () => {
     console.log('Click Import Private Key');
-    onImportPrivateKey();  // This should trigger the function passed from Popup.js
-    setPage('import-private-key');  // This should navigate to the Import Private Key page
+    onImportPrivateKey(); 
+    setPage('import-private-key');  
   };
   const handleImportRecovery = () => {
     console.log('Click Import Private Key');
-    onImportRecoveryPhrase();  // This should trigger the function passed from Popup.js
-    setPage('import-recovery-phase');  // This should navigate to the Import Private Key page
+    onImportRecoveryPhrase();  
+    setPage('import-recovery-phase'); 
   };
   const renderPage = () => {
     switch (page) {

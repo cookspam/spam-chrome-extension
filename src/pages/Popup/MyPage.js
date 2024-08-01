@@ -210,17 +210,6 @@ const MyPage = ({ pubKey, setPage }) => {
         )}
       </div>
       <div className="section">
-        <h3>Display</h3>
-        <div className="label">
-          <label>Explorer</label>
-        </div>
-        <select value={explorer} onChange={(e) => setExplorer(e.target.value)}>
-          <option value="Solana Explorer">Solana Explorer</option>
-          <option value="Solscan">Solscan</option>
-          <option value="xray">xray</option>
-        </select>
-      </div>
-      <div className="section">
         <h3>Network</h3>
         <div className="label">
           <label>RPC</label>

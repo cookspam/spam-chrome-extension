@@ -48,7 +48,7 @@ const UserInfo = ({ pubKey, setPage }) => {
       if (pubKey) {
         try {
           const solanaBalance = await getSolanaBalance(pubKey);
-          setSolanaBalance(parseFloat(solanaBalance).toFixed(2));
+          setSolanaBalance(parseFloat(solanaBalance).toFixed(3));
 
           const spamBalance = await getSpamBalance(pubKey);
           setSpamAmount(parseFloat(spamBalance).toFixed(2));

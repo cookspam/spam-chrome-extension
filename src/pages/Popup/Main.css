@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;900&display=swap');
+
 .main-container {
   text-align: center;
   justify-content: center;
@@ -16,14 +17,17 @@
 
 .header-image {
   width: 100%;
-  height: 100%; /* Fill the header container */
-  object-fit: cover; /* Ensure the image covers the container */
+  height: 100%;
+  /* Fill the header container */
+  object-fit: cover;
+  /* Ensure the image covers the container */
 }
 
 .main-title {
   font-family: 'Montserrat', sans-serif;
   font-style: italic;
-  font-weight: 900; /* Ensure this matches the font-weight available in Google Fonts */
+  font-weight: 900;
+  /* Ensure this matches the font-weight available in Google Fonts */
   font-size: 36px;
   position: absolute;
   width: 100px;
@@ -46,18 +50,23 @@
 .spam-line {
   width: 147px;
   height: 20px;
-  position: absolute; /* To use top and left properties */
+  position: absolute;
+  /* To use top and left properties */
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
   gap: 0px;
-  opacity: 1; /* Set opacity to 1 to make it visible */
+  opacity: 1;
+  /* Set opacity to 1 to make it visible */
   color: #31a5aa;
   font-size: 15px;
 }
+
 .spam-highlight {
-  color: #31a5aa; /* Change the color to match the requirement */
-  font-weight: bold !important; /* Make the text bold */
+  color: #31a5aa;
+  /* Change the color to match the requirement */
+  font-weight: bold !important;
+  /* Make the text bold */
 }
 
 .middle-section {
@@ -67,29 +76,37 @@
 .spam-amount {
   width: 180px;
   height: 28px;
-  position: absolute; /* To use top and left properties */
+  position: absolute;
+  /* To use top and left properties */
   top: 58px;
   left: 100px;
   left: 50%;
   transform: translateX(-50%);
   gap: 0px;
   border-radius: 50px;
-  opacity: 1; /* Set opacity to 1 to make it visible */
-  background-color: #31a5aa; /* Adjust this as necessary */
+  opacity: 1;
+  /* Set opacity to 1 to make it visible */
+  background-color: #31a5aa;
+  /* Adjust this as necessary */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .mine-tool-icon {
-  width: 23px; /* Adjust the size as necessary */
-  height: 18.61px; /* Adjust the size as necessary */
-  margin-right: 5px; /* Space between the icon and the text */
+  width: 23px;
+  /* Adjust the size as necessary */
+  height: 18.61px;
+  /* Adjust the size as necessary */
+  margin-right: 5px;
+  /* Space between the icon and the text */
 }
 
 .spam-amount span {
-  font-size: 14px; /* Adjust the font size as necessary */
-  color: #fff; /* Adjust the text color as necessary */
+  font-size: 14px;
+  /* Adjust the font size as necessary */
+  color: #fff;
+  /* Adjust the text color as necessary */
   font-weight: bold;
 }
 
@@ -108,37 +125,73 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
 .character-container {
   position: absolute;
   top: 233px;
   left: 0px;
-  width: 400px; /* Adjust width as necessary to fit all elements */
-  height: 100px; /* Adjust height as necessary to fit all elements */
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+}
+
+/* @keyframes moveRight {
+  0% {
+    transform: translateX(-150%);
+  }
+
+  100% {
+    transform: translateX(150%);
+  }
+} */
+
+@keyframes moveRight {
+  0% {
+    left: var(--initial-left);
+  }
+
+  100% {
+    left: calc(100% + 166px + var(--initial-left));
+  }
+}
+
+.moving-image {
+  position: absolute;
+  animation: moveRight 5s linear infinite;
 }
 
 .spam-character2 {
   position: absolute;
-  top: 0px; /* Adjust as necessary */
-  left: 160px; /* Adjust as necessary */
-  width: 66.76px;
-  height: 91.63px;
+  top: 0px;
+  left: 160px;
+  /* width: 66.76px; */
+  /* height: 91.63px; */
 }
 
 .coin {
   position: absolute;
-  top: 40px; /* Adjust as necessary */
-  left: 36px; /* Adjust as necessary */
-  width: 114px; /* Adjust the size as necessary */
-  height: 41px; /* Adjust the size as necessary */
+  top: 40px;
+  /* Adjust as necessary */
+  left: 36px;
+  /* Adjust as necessary */
+  /* width: 114px; */
+  /* Adjust the size as necessary */
+  /* height: 41px; */
+  /* Adjust the size as necessary */
 }
 
 .shadow {
   position: absolute;
-  top: 80px; /* Adjust as necessary */
-  left: 20px; /* Adjust as necessary */
-  width: 166px; /* Adjust the size as necessary */
-  height: 18px; /* Adjust the size as necessary */
-  margin-left: 8px; /* Space between the coin and the shadow */
+  top: 80px;
+  /* Adjust as necessary */
+  left: 20px;
+  /* Adjust as necessary */
+  /* width: 166px; */
+  /* Adjust the size as necessary */
+  /* height: 18px; */
+  /* Adjust the size as necessary */
+  margin-left: 8px;
+  /* Space between the coin and the shadow */
 }
 
 .testnet-solana {
@@ -155,22 +208,27 @@
   font-size: 14px;
   color: #31A5AA;
 }
+
 .footer {
   position: absolute;
-  top:500px; /* Adjust the distance from the bottom of the page */
+  top: 500px;
+  /* Adjust the distance from the bottom of the page */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   justify-content: space-between;
-  width: 90%; /* Adjust the width as needed */
+  width: 90%;
+  /* Adjust the width as needed */
 }
+
 .footer a {
   text-decoration: none;
   flex: 1;
-  
+
 }
 
-.dashboard-button, .settings-button {
+.dashboard-button,
+.settings-button {
   flex: 1;
   margin: 0 5px;
   height: 35px;
@@ -188,17 +246,20 @@
   cursor: pointer;
 }
 
-.dashboard-button:hover, .settings-button:hover {
+.dashboard-button:hover,
+.settings-button:hover {
   background-color: #31a5aa;
   color: #ffffff;
 }
 
-.dashboard-icon, .settings-icon {
+.dashboard-icon,
+.settings-icon {
   width: 20px;
   height: 20px;
   margin-right: 10px;
 }
 
-.dashboard-button:hover .dashboard-icon, .settings-button:hover .settings-icon {
+.dashboard-button:hover .dashboard-icon,
+.settings-button:hover .settings-icon {
   filter: brightness(0) invert(1);
 }

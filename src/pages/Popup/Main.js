@@ -58,6 +58,24 @@ const UserInfo = ({ pubKey, setPage }) => {
     fetchBalances();
   }, [pubKey]);
 
+  const images = [
+    {
+      src: spamCharacter2,
+      className: 'spam-character2',
+      style: { top: '0px', left: '0px', width: '66.76px', height: '91.63px' }
+    },
+    {
+      src: coin,
+      className: 'coin',
+      style: { top: '40px', left: '-124px', width: '114px', height: '41px' }
+    },
+    {
+      src: shadow,
+      className: 'shadow',
+      style: { top: '80px', left: '-140px', width: '166px', height: '18px', marginLeft: '8px' }
+    }
+  ];
+
   return (
     <div className="main-container">
       <div className="header-container">
@@ -80,13 +98,27 @@ const UserInfo = ({ pubKey, setPage }) => {
         </div>
         <img src={middleImage} className="middle-image" alt="Middle" />
         <div className="character-container">
-          <img src={shadow} className="shadow" alt="Shadow" />
-          <img src={coin} className="coin" alt="Coin" />
+          {/* <img src={shadow} className="shadow moving-image" alt="Shadow" style={{ '--initial-left': 20, '--image-width': 166 }} />
+          <img src={coin} className="coin moving-image" alt="Coin" style={{ '--initial-left': 36, '--image-width': 114 }} />
           <img
             src={spamCharacter2}
-            className="spam-character2"
+            className="spam-character2 moving-image"
             alt="Spam Character"
-          />
+            style={{ '--initial-left': 160, '--image-width': 67 }}
+          /> */}
+          {images.map((image, index) => (
+            <img
+              key={index}
+              src={image.src}
+              alt={`Moving ${index}`}
+              className="moving-image"
+              style={{
+                ...image.style,
+                '--initial-left': image.style.left,
+                '--image-width': image.style.width
+              }}
+            />
+          ))}
         </div>
 
         <p className="testnet-solana">Testnet Solana: {solanaBalance} SOL</p>

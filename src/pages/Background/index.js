@@ -57,7 +57,7 @@ let connection;
 const initializeConnection = async () => {
   const storedRpcUrl = await chrome.storage.local.get('rpcUrl');
   const rpcUrl = storedRpcUrl.rpcUrl || 'https://api.testnet.solana.com';
-  console.log("RPCCCCC",rpcUrl)
+  console.log("RPCCCCC", rpcUrl)
   connection = new Connection(rpcUrl);
 };
 initializeConnection();
@@ -198,8 +198,8 @@ const callMineProgram = async (signer) => {
       signer.publicKey
     );
     const { busAccount, proofAccount, treasuryAccount } = await findAccounts(
-      signer.publicKey, 
-	  programId
+      signer.publicKey,
+      programId
     );
     // Discriminant for the Mine instruction
     //console.log("Mine discriminant:", mineDiscriminant);
@@ -228,7 +228,7 @@ const callMineProgram = async (signer) => {
 
     // Construct the data for the Mine instruction
     const data = Buffer.concat([mineDiscriminant, nextHash, nonceBuffer]);
-   // console.log('Constructed data:', data);
+    // console.log('Constructed data:', data);
 
     console.log('Creating transaction instruction...');
     const instruction = new TransactionInstruction({
@@ -301,32 +301,32 @@ export const getSpamBalance = async (pubKey) => {
 };
 
 export const getClaimableSpamBalance = async (pubKey) => {
-	try {
-	  console.log("Fetching claimable rewards for:", pubKey); // Debugging line
-	  const publicKey = new PublicKey(pubKey);
-	  const [proofAccount] = getProofAccount(publicKey);
-	  console.log("Proof account address:", proofAccount.toBase58()); // Debugging line
-	  const accountInfo = await connection.getAccountInfo(proofAccount);
-	  if (accountInfo === null) {
-		throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
-	  }
-	  const data = accountInfo.data;
-	  console.log("Proof account data:", data); // Log the data for debugging
-	  const bufferData = Buffer.from(data);
-	  const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8);
-	  console.log("Proof account adjusted data:", adjustedData); // Log the data for debugging
-  
-	  const proof = ProofLayout.decode(Buffer.from(adjustedData));
-	  console.log("Decoded proof:", proof); // Log the decoded proof for debugging
-	  console.log("Proof claimable rewards:", proof.claimable_rewards); // Log the data for debugging
-	  
-	  return proof.claimable_rewards / 1e9;
-	} catch (error) {     
-	  console.error('Error getting Spam balance:', error);
-	  return 0;
-	}
-  };
-  
+  try {
+    console.log("Fetching claimable rewards for:", pubKey); // Debugging line
+    const publicKey = new PublicKey(pubKey);
+    const [proofAccount] = getProofAccount(publicKey);
+    console.log("Proof account address:", proofAccount.toBase58()); // Debugging line
+    const accountInfo = await connection.getAccountInfo(proofAccount);
+    if (accountInfo === null) {
+      throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
+    }
+    const data = accountInfo.data;
+    console.log("Proof account data:", data); // Log the data for debugging
+    const bufferData = Buffer.from(data);
+    const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8);
+    console.log("Proof account adjusted data:", adjustedData); // Log the data for debugging
+
+    const proof = ProofLayout.decode(Buffer.from(adjustedData));
+    console.log("Decoded proof:", proof); // Log the decoded proof for debugging
+    console.log("Proof claimable rewards:", proof.claimable_rewards); // Log the data for debugging
+
+    return proof.claimable_rewards / 1e9;
+  } catch (error) {
+    console.error('Error getting Spam balance:', error);
+    return 0;
+  }
+};
+
 // Move the function call to your component or app initialization
 const sendBackgroundRequests = async (signer) => {
   try {
@@ -341,23 +341,23 @@ const sendBackgroundRequests = async (signer) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // 2. A page requested user data, respond with a copy of `user`
   if (message.message === 'Start') {
-    const mineSpam = () => {
-      //console.log('Mining spam...', message.privateKey);
-      const signer = Keypair.fromSecretKey(
-        bs58.decode(message.privateKey.privateKey)
-      );
-      console.log('Signer: ', signer)
-	  console.log('Signer.publicKey: ', signer.publicKey)
-	  
-      try {
-        sendBackgroundRequests(signer);
-      } catch (error) {
-        console.error('Error sending background request:', error.message);
-      }
-    };
+    // const mineSpam = () => {
+    //   //console.log('Mining spam...', message.privateKey);
+    //   const signer = Keypair.fromSecretKey(
+    //     bs58.decode(message.privateKey.privateKey)
+    //   );
+    //   console.log('Signer: ', signer)
+    //   console.log('Signer.publicKey: ', signer.publicKey)
 
-    const intervalId = setInterval(mineSpam, 12000);
-    return () => clearInterval(intervalId);
+    //   try {
+    //     sendBackgroundRequests(signer);
+    //   } catch (error) {
+    //     console.error('Error sending background request:', error.message);
+    //   }
+    // };
+
+    // const intervalId = setInterval(mineSpam, 12000);
+    // return () => clearInterval(intervalId);
   }
   sendResponse('sendResponse');
   return true;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getSolanaBalance, getSpamBalance } from '../Background/index';
 import copyIcon from '../../assets/img/copy.png';
-import homeIcon from '../../assets/img/home.png';
-import closeIcon from '../../assets/img/check.png';
+import homeIcon from '../../assets/img/back.png';
+
 import './MyPage.css';
 import { Keypair } from '@solana/web3.js';
 import bs58 from 'bs58';
@@ -142,6 +142,8 @@ const MyPage = ({ pubKey, setPage }) => {
 
   return (
     <div className="my-page-container">
+      {/* Overlay for blurring the background when alert is active */}
+      {alertMessage && <div className="overlay"></div>}
       <h2 className="page-title">My Page</h2>
       <div className="section">
         <h3>My Account</h3>
@@ -169,7 +171,7 @@ const MyPage = ({ pubKey, setPage }) => {
           <label>Keypair</label>
         </div>
         <div className="keypair-buttons">
-          <button onClick={() => setImportModalVisible(true)}>Import</button>
+          <button onClick={handleImportButtonClick}>Import</button>
           <button onClick={handleExport}>Export</button>
         </div>
         {isExportModalVisible && (
@@ -197,9 +199,7 @@ const MyPage = ({ pubKey, setPage }) => {
                 placeholder="Enter your private key"
                 className="import-input"
               />
-              <button onClick={handleImport}>
-                Save
-              </button>
+              <button onClick={handleImport}>Save</button>
             </div>
             {importErrorMessage && (
               <p className="error-message">{importErrorMessage}</p>

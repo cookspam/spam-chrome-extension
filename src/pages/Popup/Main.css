@@ -43,6 +43,16 @@
   left: 158.01px;
 }
 
+.settings-icon {
+  position: absolute;
+  width: 25px;
+  height: 27px;
+  top: 25px;
+  left: 300px;
+  gap: 0px;
+  opacity: 0px;
+}
+
 .spam-line {
   width: 147px;
   height: 20px;
@@ -153,52 +163,50 @@
   transform: translateX(-50%);
 
   font-size: 14px;
-  color: #31A5AA;
+  color: #31a5aa;
 }
 .footer {
   position: absolute;
-  top:500px; /* Adjust the distance from the bottom of the page */
+  top: 500px; /* Adjust the distance from the bottom of the page */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 90%; /* Adjust the width as needed */
 }
 .footer a {
   text-decoration: none;
-  flex: 1;
-  
 }
 
-.dashboard-button, .settings-button {
-  flex: 1;
+.dashboard-button {
   margin: 0 5px;
   height: 35px;
   margin-bottom: 50px;
   border-radius: 50px;
-  border: 2px solid #31A5AA;
+  border: 2px solid #31a5aa;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(133, 204, 207, 0.1);
-  color: #31A5AA;
+  color: #31a5aa;
   padding: 10px 20px;
   text-decoration: none;
   font-size: 16px;
   cursor: pointer;
+  width: 250px;
 }
 
-.dashboard-button:hover, .settings-button:hover {
+.dashboard-button:hover {
   background-color: #31a5aa;
   color: #ffffff;
 }
 
-.dashboard-icon, .settings-icon {
+.dashboard-icon {
   width: 20px;
   height: 20px;
   margin-right: 10px;
 }
 
-.dashboard-button:hover .dashboard-icon, .settings-button:hover .settings-icon {
+.dashboard-button:hover .dashboard-icon {
   filter: brightness(0) invert(1);
 }

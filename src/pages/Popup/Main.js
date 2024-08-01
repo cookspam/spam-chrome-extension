@@ -7,10 +7,14 @@ import openDashboardIcon from '../../assets/img/desktop_icon.png';
 import coin from '../../assets/img/coin_icon.png';
 import minetool from '../../assets/img/minetool.png';
 import shadow from '../../assets/img/shadow.png';
-import settingsIcon from '../../assets/img/person.png';
+import settingsIcon from '../../assets/img/setting.png';
 import { Keypair } from '@solana/web3.js';
 import bs58 from 'bs58';
-import { getSolanaBalance, getSpamBalance, getClaimableSpamBalance } from '../Background/index';
+import {
+  getSolanaBalance,
+  getSpamBalance,
+  getClaimableSpamBalance,
+} from '../Background/index';
 import './Main.css';
 
 const UserInfo = ({ pubKey, setPage }) => {
@@ -26,7 +30,7 @@ const UserInfo = ({ pubKey, setPage }) => {
       if (!pubKey || !privateKey) {
         throw new Error('pubkey or privatekey is missing from local storage');
       }
-      setPrivateKey(privateKey)
+      setPrivateKey(privateKey);
       const signer = Keypair.fromSecretKey(bs58.decode(privateKey.privateKey));
       setSigner(signer);
     }
@@ -73,6 +77,13 @@ const UserInfo = ({ pubKey, setPage }) => {
           className="spam-character-header"
           alt="Spam Character"
         />
+
+        <img
+          src={settingsIcon}
+          className="settings-icon"
+          alt="My Page"
+          onClick={() => setPage('mypage')}
+        />
       </div>
       <div className="middle-section">
         <p className="spam-line">
@@ -81,7 +92,9 @@ const UserInfo = ({ pubKey, setPage }) => {
 
         <div className="spam-amount">
           <img src={minetool} alt="Mine Tool" className="mine-tool-icon" />
-          <span>{spamAmount} + {claimableRewards}</span>
+          <span>
+            {spamAmount} + {claimableRewards}
+          </span>
         </div>
         <img src={middleImage} className="middle-image" alt="Middle" />
         <div className="character-container">
@@ -97,28 +110,20 @@ const UserInfo = ({ pubKey, setPage }) => {
         <p className="testnet-solana">Testnet Solana: {solanaBalance} SOL</p>
       </div>
       <div className="footer">
-      <a href="https://spam.supply/settings" target="_blank" rel="noopener noreferrer">
-        <button className="dashboard-button">
-          <img
-            src={openDashboardIcon}
-            className="dashboard-icon"
-            alt="Open Dashboard"
-          />
-          Dashboard
-        </button>
-        </a>
-          <button 
-            className="settings-button"
-            onClick={() => setPage('mypage')}
-          >
+        <a
+          href="https://spam.supply/settings"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <button className="dashboard-button">
             <img
-              src={settingsIcon}
-              className="settings-icon"
-              alt="My Page"
+              src={openDashboardIcon}
+              className="dashboard-icon"
+              alt="Open Dashboard"
             />
-            My Page
+            Dashboard
           </button>
-    
+        </a>
       </div>
     </div>
   );

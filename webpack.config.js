@@ -169,7 +169,17 @@ var options = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: 'src/assets/img/spam_character1.png',
+          from: 'src/assets/img/icon16.png',
+          to: path.join(__dirname, 'build'),
+          force: true,
+        },
+        {
+          from: 'src/assets/img/icon48.png',
+          to: path.join(__dirname, 'build'),
+          force: true,
+        },
+        {
+          from: 'src/assets/img/icon128.png',
           to: path.join(__dirname, 'build'),
           force: true,
         },

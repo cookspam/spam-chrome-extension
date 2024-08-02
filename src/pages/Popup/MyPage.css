@@ -178,3 +178,17 @@ select {
   font-size: 10px;
   font-weight: 700;
 }
+.input-group button,
+.keypair-buttons button,
+.alert button,
+.back-button {
+  transition: background-color 0.3s, color 0.3s; 
+}
+
+.input-group button:hover,
+.keypair-buttons button:hover,
+.alert button:hover,
+.back-button:hover {
+  background-color:  #5b5a5a; 
+  color: white;
+}

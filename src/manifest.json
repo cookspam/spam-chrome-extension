@@ -8,15 +8,19 @@
     "storage"
   ],
   "host_permissions": [
-    "https://*/*"
+    "https://api.testnet.solana.com/*",
+    "https://solana-testnet.g.allthatnode.com/*",
+    "https://*.quiknode.pro/*"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "spam_character1.png"
+    "default_icon": "icon128.png"
   },
   
   "icons": {
-    "128": "spam_character1.png"
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   },
   "content_scripts": [
     {

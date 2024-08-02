@@ -23,6 +23,7 @@ const MyPage = ({ pubKey, setPage }) => {
   const [importErrorMessage, setImportErrorMessage] = useState('');
   const [importMessage, setImportMessage] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
+  const [rpcAlertMessage, setRpcAlertMessage] = useState('');
 
   useEffect(() => {
     const fetchKeysAndBalances = async () => {
@@ -46,13 +47,16 @@ const MyPage = ({ pubKey, setPage }) => {
     setTempRpcUrl(rpcUrl);
   }, [rpcUrl]);
 
+ 
+
   const handleSaveRpc = () => {
     const finalRpcUrl = tempRpcUrl.trim() === '' ? defaultRpcUrl : tempRpcUrl;
     setRpcUrl(finalRpcUrl);
     chrome.storage.local.set({ rpcUrl: finalRpcUrl });
+    setRpcAlertMessage('Your RPC is successfully changed');
     setIsFocused(false);
   };
-
+  
   const handleInputFocus = () => {
     setIsFocused(true);
   };
@@ -133,9 +137,11 @@ const MyPage = ({ pubKey, setPage }) => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
   };
-
+ 
+  
   const closeAlert = () => {
     setAlertMessage('');
+    setRpcAlertMessage(''); // Clear RPC alert message
     window.location.reload();
   };
 
@@ -228,9 +234,9 @@ const MyPage = ({ pubKey, setPage }) => {
       <button className="back-button" onClick={() => setPage('userInfo')}>
         <img src={homeIcon} className="back-icon" alt="Back" />
       </button>
-      {alertMessage && (
+      {(alertMessage || rpcAlertMessage) && (
         <div className="alert">
-          <p>{alertMessage}</p>
+          <p>{alertMessage || rpcAlertMessage}</p>
           <button onClick={closeAlert}>Close</button>
         </div>
       )}

@@ -22,13 +22,7 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*", "<all_urls>"],
-      "js": ["contentScript.bundle.js"],
-      "css": ["content.styles.css"]
-    }
-  ],
+ 
   "devtools_page": "devtools.html",
   "web_accessible_resources": [
     {

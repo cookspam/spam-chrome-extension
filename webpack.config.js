@@ -38,7 +38,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 var options = {
   mode: process.env.NODE_ENV || 'development',
   entry: {
-   
     options: path.join(__dirname, 'src', 'pages', 'Options', 'index.jsx'),
     popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.jsx'),
     background: path.join(__dirname, 'src', 'pages', 'Background', 'index.js'),
@@ -129,7 +128,8 @@ var options = {
       .map((extension) => '.' + extension)
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
       fallback: {
-        "buffer": require.resolve("buffer/")
+        "buffer": require.resolve("buffer/"),
+        'worker_threads': false 
     }
   },
   plugins: [
@@ -185,6 +185,17 @@ var options = {
         },
       ],
     }),
+    new CopyWebpackPlugin({
+      patterns: [
+        // Other patterns you have
+        {
+          from: 'src/pages/Content/index.js',
+          to: path.join(__dirname, 'build', 'Content/index.js'),
+          force: true,
+        },
+      ],
+    }),
+    
    
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'src', 'pages', 'Options', 'index.html'),

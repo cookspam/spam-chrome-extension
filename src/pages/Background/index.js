@@ -11,6 +11,7 @@ import {
   sendAndConfirmTransaction,
   SYSVAR_SLOT_HASHES_PUBKEY,
   TransactionInstruction,
+  ComputeBudgetProgram,
   SystemProgram,
   SendTransactionError,
 } from '@solana/web3.js';
@@ -21,13 +22,15 @@ import { publicKey } from '@solana/buffer-layout-utils';
 import bs58 from 'bs58';
 
 const ProofLayout = struct([
-  publicKey('authority'),
-  nu64('claimable_rewards'),
-  blob(32, 'hash'),
-  nu64('total_hashes'),
-  nu64('total_rewards'),
-  // Add other fields with appropriate types
+  publicKey('authority'),        // 32 bytes
+  nu64('claimable_rewards'),     // 8 bytes
+  blob(32, 'hash'),              // 32 bytes
+  nu64('total_hashes'),          // 8 bytes
+  nu64('total_rewards')          // 8 bytes
+  // Total should be 88 bytes if everything matches.
 ]);
+
+const CU_LIMIT_MINE = 500 + (2300 * 5);
 
 const programId = new PublicKey('cookr8CThnfEQZvvrB6zhh5K4X8XNkPjJi4uUDtkBuG');
 const BUS_ADDRESSES = [
@@ -61,6 +64,137 @@ const initializeConnection = async () => {
   console.log('RPC set', rpcUrl);
   connection = new Connection(rpcUrl, { disableRetryOnRateLimit: false });
 };
+
+const checkAndDistribute = async (mainPublicKey, mainPrivateKey) => {
+  // Retrieve 'solDistributed' from chrome storage
+  const storageData = await chrome.storage.local.get('solDistributed');
+  
+  // Ensure 'solDistributed' is initialized as an array
+  let solDistributed = storageData.solDistributed || [];
+  if (!Array.isArray(solDistributed)) {
+    solDistributed = [];
+  }
+
+  console.log("Current 'solDistributed' list:", solDistributed);
+
+  // Check the main address balance
+  const balance = await connection.getBalance(mainPublicKey);
+  console.log(`Main address balance: ${balance / 1e9} SOL`);
+
+  // Ensure the main balance is above 0.05 SOL before attempting distribution
+  if (balance < 0.02 * 1e9) {
+    console.log("Insufficient balance for distribution.");
+    return;
+  }
+
+  // Collect all recipient public keys that haven't received SOL
+  let recipientAddresses = [];
+  for (let i = 2; i <= 5; i++) {
+    const key = `pubKey${i}`;
+
+    // Skip addresses that have already received SOL
+    if (solDistributed.includes(key)) {
+      console.log(`${key} already received SOL, skipping...`);
+      continue;
+    }
+
+    const { [key]: pubKeyString } = await chrome.storage.local.get(key);
+    console.log(`Checking local storage for ${key}: ${pubKeyString}`);
+
+    if (!pubKeyString) {
+      console.error(`Public key for ${key} not found in local storage.`);
+      continue;
+    }
+
+    recipientAddresses.push(pubKeyString);
+  }
+
+  if (recipientAddresses.length === 0) {
+    console.log("No addresses left to distribute to.");
+    return;
+  }
+
+  console.log("Recipient addresses for distribution:", recipientAddresses);
+
+  // Send SOL to all collected recipient addresses at once
+  await sendSOLToAll(mainPrivateKey, recipientAddresses, 0.001);
+
+  // Update 'solDistributed' with the successfully distributed addresses
+  solDistributed.push(...recipientAddresses.map((_, idx) => `pubKey${idx + 2}`));
+
+  // Store the updated solDistributed array
+  await chrome.storage.local.set({ solDistributed });
+  console.log("Updated 'solDistributed' list:", solDistributed);
+
+  if (solDistributed.length === 4) {
+    console.log('Distribution to all addresses completed.');
+  }
+};
+
+// Function to send SOL to all collected recipient addresses
+const sendSOLToAll = async (privateKey, recipientAddresses, amount) => {
+  const connection = new Connection('https://api.testnet.solana.com');
+
+  // Decode the main private key
+  const mainPrivateKey = bs58.decode(privateKey);
+  const sender = Keypair.fromSecretKey(mainPrivateKey);
+
+  const transaction = new Transaction();
+
+  for (const recipient of recipientAddresses) {
+    const transferInstruction = SystemProgram.transfer({
+      fromPubkey: sender.publicKey,
+      toPubkey: new PublicKey(recipient),
+      lamports: amount * 1e9, // Convert SOL to lamports
+    });
+    transaction.add(transferInstruction);
+  }
+
+  // Setting up the latest blockhash and fee payer
+  const latestBlockhash = await connection.getLatestBlockhash();
+  transaction.recentBlockhash = latestBlockhash.blockhash;
+  transaction.feePayer = sender.publicKey;
+
+  try {
+    // Signing and sending the transaction
+    const signature = await sendAndConfirmTransaction(
+      connection, 
+      transaction, 
+      [sender]
+    );
+    console.log(`Transaction successful with signature: ${signature}`);
+  } catch (error) {
+    console.error("Error sending SOL:", error);
+    // Handle the rate limit error or other issues, possibly retry if needed
+  }
+};
+
+// Start the balance check and distribution logic
+const startBalanceCheck = async (mainPubKey, mainPrivateKey) => {
+  console.log(`Starting balance check for: ${mainPubKey}`);
+  const intervalId = setInterval(async () => {
+    const storageData = await chrome.storage.local.get('solDistributed');
+    
+    // Ensure 'solDistributed' is initialized as an array
+    let solDistributed = storageData.solDistributed || [];
+    
+    if (!Array.isArray(solDistributed)) {
+      solDistributed = [];
+    }
+
+    console.log("Current 'solDistributed' list during interval:", solDistributed);
+
+    if (solDistributed.length === 4) {
+      console.log('SOL already distributed to all addresses. Stopping further checks.');
+      clearInterval(intervalId); // Stop checking once all addresses have been distributed to
+      return;
+    }
+
+    await checkAndDistribute(new PublicKey(mainPubKey), mainPrivateKey); // Call the check and distribution function
+  }, 10000); // Check every 10 seconds
+};
+
+
 initializeConnection();
 
 
@@ -69,7 +203,63 @@ const getProofAccount = (signerPublicKey) => {
     [Buffer.from('proof'), signerPublicKey.toBuffer()],
     programId
   );
+}; //5
+
+const getTreasuryAccountInfo = async () => {
+  console.log("in get treasury account info")
+  const accountInfo = await connection.getAccountInfo(TREASURY_ADDRESS);
+
+  if (!accountInfo) {
+    throw new Error(`Treasury account does not exist`);
+  }
+
+  // Assuming the data structure matches your Rust code's structure, decode the treasury information
+  const data = accountInfo.data;
+  const bufferData = Buffer.from(data);
+
+  // Adjust the buffer slicing if necessary to match the data structure (replace with appropriate decoding logic)
+  const treasury = {
+    difficulty: bufferData.readBigUInt64BE(0), // Assuming difficulty is stored as u64 at offset 0, adjust this if necessary
+    reward_rate: bufferData.readBigUInt64BE(8), // Adjust if stored differently
+    //last_reset_at: bufferData.readBigUInt64BE(16),
+    //total_claimed_rewards: bufferData.readBigUInt64BE(24)
+  };
+
+  console.log(`Difficulty: ${treasury.difficulty}`);
+  return treasury;
 };
+
+// Register Proof Accounts
+const registerAllSigners = async (mainSigner) => {
+  try {
+    for (let i = 1; i <= 5; i++) {
+      const signer = await signerByIndex(i);
+      const [proofAccount] = getProofAccount(signer.publicKey);
+      const minRent = await connection.getMinimumBalanceForRentExemption(ProofLayout.span);
+      const balance = await connection.getBalance(proofAccount);
+      
+      // Fund the proof account if balance is insufficient
+      if (balance < minRent) {
+        const fundTx = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: mainSigner.publicKey,
+            toPubkey: proofAccount,
+            lamports: minRent - balance,
+          })
+        );
+        await sendAndConfirmTransaction(connection, fundTx, [mainSigner]);
+        console.log(`Funded proof account ${i} successfully`);
+      }
+      
+      // Register the proof account
+      await callRegister(signer);
+      console.log(`Registered signer ${i}: ${signer.publicKey.toBase58()}`);
+    }
+  } catch (error) {
+    console.error('Error registering signers:', error);
+  }
+};
+
 
 async function callRegister(signer) {
   const [proofAccount, bumpSeed] = getProofAccount(signer.publicKey);
@@ -84,7 +274,7 @@ async function callRegister(signer) {
     ],
     programId: programId,
     data,
-  });
+  }); 
 
   const transaction = new Transaction().add(instruction);
 
@@ -97,44 +287,39 @@ async function callRegister(signer) {
     const signature = await sendAndConfirmTransaction(connection, transaction, [
       signer,
     ]);
-    console.log('Transaction signature', signature);
+    console.log('Registration Transaction signature', signature);
   } catch (error) {
-    console.error('Transaction failed', error);
+    console.error('Registration Transaction failed', error);
   }
-}
+} //5
 
-const findAccounts = async (signerPublicKey, programId) => {
-  try {
-    const busAccount = new PublicKey(BUS_ADDRESSES[0]); // Use the first bus address for this example
+// Mine Hash for each account using workers
+const startMiningAllAccounts = async () => {
+  const treasuryInfo = await getTreasuryAccountInfo();
+  const miningResults = [];
+  //const difficulty = treasuryInfo.difficulty;
+  const difficulty = Buffer.from([0, ...new Array(31).fill(255)]);
 
-    // Deriving the proof account
-    const [proofAccount] = getProofAccount(signerPublicKey);
+  for (let i = 1; i <= 5; i++) {
+    try {
+      const signer = await signerByIndex(i);
+      const [proofAccount] = getProofAccount(signer.publicKey);
+      const initialHash = await fetchInitialHash(proofAccount);
+      //console.log("INITIAL HASH EARNED", initialHash)
 
-    const treasuryAccount = TREASURY_ADDRESS;
-
-    // Function to log account details
-    const logAccountDetails = async (programId) => {
-      const accountInfo = await connection.getAccountInfo(programId);
-      if (accountInfo === null) {
-        throw new Error(`Account ${programId.toBase58()} does not exist`);
-      }
-    };
-    console.log('Checking account owners...');
-    await logAccountDetails(busAccount);
-    await logAccountDetails(proofAccount);
-    await logAccountDetails(treasuryAccount);
-
-    return {
-      busAccount,
-      proofAccount,
-      treasuryAccount,
-    };
-  } catch (error) {
-    console.error('Error finding accounts:', error);
-    throw error;
+      console.log(`Mining for signer ${signer.publicKey.toBase58()}`);
+      const result = findNextHash(initialHash, difficulty, signer.publicKey);
+      //console.log("Mining result for signer:", result);
+      miningResults.push(result);
+    } catch (error) {
+      console.error(`Error mining for account ${i}:`, error)
+    } 
   }
+  console.log("MINING RESULT->arg of submitMineHashes", miningResults)
+  return miningResults;
 };
 
+// Function to find the next valid hash
 const findNextHash = (hash, difficulty, signer) => {
   let nextHash;
   let nonce = 0;
@@ -163,91 +348,145 @@ const findNextHash = (hash, difficulty, signer) => {
   return { nextHash, nonce };
 };
 
-const fetchInitialHash = async (proofAccount) => {
-  const accountInfo = await connection.getAccountInfo(proofAccount);
-  if (accountInfo === null) {
-    throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
+// Submit mined hashes
+const submitMinedHashes = async (miningResults) => {
+  console.log("IN: submitMiniedHashes")
+  try {
+    let instructions = [];
+    //const mainSigner = await signerByIndex(1);
+    let signers = []
+    const priorityFee = 2000;
+
+    // Add compute budget instructions for CU limit and price
+    const computeBudgetIx = ComputeBudgetProgram.setComputeUnitLimit({ units: CU_LIMIT_MINE });
+    const computePriceIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFee });
+    instructions.push(computeBudgetIx, computePriceIx);
+
+    for (let i = 0; i < miningResults.length; i++) {
+      const signer = await signerByIndex(i + 1);
+      console.log("singer (line 377)", signer, signers)
+      signers.push(signer);
+
+      const { nextHash, nonce } = miningResults[i];
+      const busAccount = new PublicKey(BUS_ADDRESSES[i % BUS_ADDRESSES.length]);
+      const treasuryAccount = TREASURY_ADDRESS;
+     
+      // Convert nextHash to Buffer if it's a Uint8Array
+      const nonceBuffer = new BN(nonce).toArrayLike(Buffer, 'le', 8);
+      const data = Buffer.concat([Buffer.from([2]), nextHash, nonceBuffer]);
+
+      // Create a transaction instruction
+      instructions.push(new TransactionInstruction({
+        keys: [
+          { pubkey: signer.publicKey, isSigner: true, isWritable: true },
+          { pubkey: busAccount, isSigner: false, isWritable: true },
+          { pubkey: getProofAccount(signer.publicKey)[0], isSigner: false, isWritable: true },
+          { pubkey: treasuryAccount, isSigner: false, isWritable: false },
+          { pubkey: SYSVAR_SLOT_HASHES_PUBKEY, isSigner: false, isWritable: false },
+        ],
+        programId,
+        data,
+      }));
+    //   // Check if the transaction is getting too large
+    //  if (instructions.length >= 5) { // Adjust this based on testing
+    //   // Send the current batch of instructions
+    //   await sendTransactionBatch(instructions, signers);
+    //   instructions = [computeBudgetIx, computePriceIx]; // Reset with budget instructions
+    //   signers = [];
+    // }
   }
-  const data = accountInfo.data;
-  const bufferData = Buffer.from(data);
-  const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8);
+  // Send any remaining instructions
  
-  const proof = ProofLayout.decode(Buffer.from(adjustedData));
-  return Buffer.from(proof.hash);
+    console.log("INSTRUCTION remaining", instructions)
+    await sendTransactionBatch(instructions, signers);
+  
+
+  console.log('Mined hashes submitted successfully');
+  } catch (error) {
+    console.error('Error submitting mined hashes:', error);
+    throw error;
+  }
 };
 
-const callMineProgram = async (signer) => {
+// Helper function to send the transaction batch
+const sendTransactionBatch = async (instructions, signers) => {
+  const transaction = new Transaction().add(...instructions);
+  transaction.feePayer = signers[0].publicKey;
+  transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+  // Log the transaction details
+  console.log('Transaction details:', transaction);
+
   try {
-    console.log(
-      'Calling mine program...signer:',
-      programId,
-      signer,
-      signer.publicKey
-    );
-    const { busAccount, proofAccount, treasuryAccount } = await findAccounts(
-      signer.publicKey,
-      programId
-    );
-
-    // Discriminant for the Mine instruction
-    const mineDiscriminant = Buffer.from([2]);
-    //console.log("Mine discriminant after assignment:", mineDiscriminant);
-
-    // Example difficulty (replace with your actual difficulty)
-    const difficulty = Buffer.from([0, ...new Array(31).fill(255)]);
-    //console.log("Difficulty:", difficulty);
-
-    // Initial hash (replace with your actual initial hash)
-    const initialHash = await fetchInitialHash(proofAccount);
-    //console.log("Initial hash:", initialHash);
-
-    // Compute next hash and nonce
-    console.log('Computing next hash and nonce...');
-    const { nextHash, nonce } = findNextHash(
-      initialHash,
-      difficulty,
-      signer.publicKey
-    );
-
-    // Convert nonce to 8 bytes using bn.js
-    const nonceBuffer = new BN(nonce).toArrayLike(Buffer, 'le', 8);
-  //  console.log('Nonce buffer:', nonceBuffer);
-
-    // Construct the data for the Mine instruction
-    const data = Buffer.concat([mineDiscriminant, nextHash, nonceBuffer]);
-    // console.log('Constructed data:', data);
-
-    console.log('Creating transaction instruction...');
-    const instruction = new TransactionInstruction({
-      keys: [
-        { pubkey: signer.publicKey, isSigner: true, isWritable: true },
-        { pubkey: busAccount, isSigner: false, isWritable: true },
-        { pubkey: proofAccount, isSigner: false, isWritable: true },
-        { pubkey: treasuryAccount, isSigner: false, isWritable: false },
-        {
-          pubkey: SYSVAR_SLOT_HASHES_PUBKEY,
-          isSigner: false,
-          isWritable: false,
-        },
-      ],
-      programId: programId,
-      data,
-    });
-
-    const transaction = new Transaction().add(instruction);
-    transaction.feePayer = signer.publicKey;
-    transaction.recentBlockhash = (
-      await connection.getLatestBlockhash()
-    ).blockhash;
-
-    console.log('Sending mine transaction...');
-    const signature = await sendAndConfirmTransaction(connection, transaction, [
-      signer,
-    ]);
-    console.log('Mine program call successful with signature:', signature);
+    const simulationResult = await connection.simulateTransaction(transaction);
+    console.log('Simulation logs:', simulationResult.value.logs);
+    // Sign the transaction with all signers
+    transaction.sign(...signers);
+    // Log the transaction details after signing
+    console.log("Transaction details after signing:", transaction);
+    await sendAndConfirmTransaction(connection, transaction, signers);
   } catch (error) {
-    console.error('Error calling mine program:', error);
+    if (error instanceof SendTransactionError) {
+      console.error("Transaction failed with logs:", error.logs);
+    } else {
+      console.error("Unexpected error:", error);
+    }
   }
+};
+
+
+const fetchInitialHash = async (proofAccount) => {
+  try {
+    console.log("Fetching account info for:", proofAccount.toBase58());
+
+    const accountInfo = await connection.getAccountInfo(proofAccount);
+    console.log("ACCOUNT INFO", proofAccount.toBase58(), accountInfo)
+
+    if (accountInfo === null) {
+      throw new Error(`Account ${proofAccount.toBase58()} does not exist`);
+    }
+
+    const data = accountInfo.data;
+    
+    // Check if buffer length matches expectations
+    if (data.length < ProofLayout.span) {
+      console.warn(`Unexpected buffer length: ${data.length}. Expected at least ${ProofLayout.span}.`);
+      throw new Error("Buffer is too short to decode.");
+    }
+
+    const bufferData = Buffer.from(data);
+    const adjustedData = Uint8Array.prototype.slice.call(bufferData, 8);
+
+    const proof = ProofLayout.decode(Buffer.from(adjustedData));
+   // const proof = ProofLayout.decode(Buffer.from(data));
+    console.log("Decoded proof:", proof);
+
+    return Buffer.from(proof.hash);
+  } catch (error) {
+    console.error("Error fetching account info:", error);
+    throw error;
+  }
+};
+
+const signerByIndex = async (index) => {
+  // Retrieve the keypair from chrome storage
+  const { [`pubKey${index}`]: pubKeyString, [`privateKey${index}`]: privateKeyString } = await chrome.storage.local.get([`pubKey${index}`, `privateKey${index}`]);
+
+  if (!pubKeyString || !privateKeyString) {
+    throw new Error(`Keypair for index ${index} not found.`);
+  }
+
+  // Decode the private key and return the signer
+  const privateKey = bs58.decode(privateKeyString);
+  const signer = Keypair.fromSecretKey(privateKey);
+
+  // Verify if the loaded public key matches
+  console.log(`Loaded public key for index ${index}: ${signer.publicKey.toBase58()}`);
+  if (signer.publicKey.toBase58() !== pubKeyString) {
+    throw new Error(`Mismatch between stored public key and generated keypair for index ${index}`);
+  }
+
+  return signer;
 };
 
 // New functions to get balances
@@ -315,51 +554,51 @@ export const getClaimableSpamBalance = async (pubKey) => {
   }
 };
 
-// Move the function call to your component or app initialization
-const sendBackgroundRequests = async (signer) => {
-  try {
-    //const { pubkeyString, signer } = initializeKeys();
-    console.log('Initialized keys');
+// // Move the function call to your component or app initialization
+// const sendBackgroundRequests = async (signer) => {
+//   try {
+//     //const { pubkeyString, signer } = initializeKeys();
+//     console.log('Initialized keys');
 
-    await callMineProgram(signer);
-  } catch (error) {
-    console.error('Error during mining process:', error);
-  }
-};
-const sendRegister = async (signer) => {
-  try {
-    callRegister(signer);
-  } catch (error) {
-    console.error('Error during sendRegister call:', error);
-  }
-};
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // 2. A page requested user data, respond with a copy of `user`
+//     await callMineProgram(signer);
+//   } catch (error) {
+//     console.error('Error during mining process:', error);
+//   }
+// };
+
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  console.log("Background script received message: ", message);
 
   if (message.message === 'Start') {
-    const signer = Keypair.fromSecretKey(
-      bs58.decode(message.privateKey.privateKey)
-    );
-    // console.log('Signer: ', signer);
-    // console.log('Signer.publicKey: ', signer.publicKey);
-
-    sendRegister(signer);
-
-    const mineSpam = () => {
-      
-      try {
-        sendBackgroundRequests(signer);
-      } catch (error) {
-        console.error('Error sending background request:', error.message);
-      }
-    };
-
-    const intervalId = setInterval(mineSpam, 60000);
-    return () => clearInterval(intervalId);
+    console.log("Start received")
+    try {
+      //Register all signer once
+      await registerAllSigners(await signerByIndex(1)); // Main signer
+      // Set up an interval to continuously mine
+      const intervalId = setInterval(async () => {
+        try {
+          console.log("Starting mining process...");
+          const miningResults = await startMiningAllAccounts();
+          await submitMinedHashes(miningResults);
+        } catch (error) {
+          console.error("Error during mining process:", error);
+        }
+      }, 10000); // Adjust the interval (in milliseconds) as needed
+    // Save the interval ID if needed to clear later
+      sendResponse({ success: true, intervalId });
+    } catch (error) {
+      console.error("Error during register signers:", error);
+      sendResponse({ success: false, error: error.message });
+    }
+  } else if (message.message === 'StartBalanceCheck') {
+    const { pubKey, privateKey } = message;
+    console.log("balance check starting...")
+    startBalanceCheck(pubKey, privateKey);
   }
-  sendResponse('sendResponse');
+  
   return true;
 });
+
 const keepAlive = () => setInterval(chrome.runtime.getPlatformInfo, 20e3);
 chrome.runtime.onStartup.addListener(keepAlive);
 keepAlive();

@@ -3,10 +3,16 @@ import './ImportPrivateKey.css';
 import { Keypair } from '@solana/web3.js';
 import bs58 from 'bs58';
 
+const generateSolanaKeypair = () => {
+  const keypair = Keypair.generate();
+  const pubKey = keypair.publicKey.toBase58();
+  const privateKey = bs58.encode(keypair.secretKey);
+  return { pubKey, privateKey, keypair };
+};
+
 const ImportPrivateKey = ({ onImport }) => {
   const [privateKey, setPrivateKey] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [page, setPage] = useState('import-private-key');
 
   const handleImport = async () => {
     if (privateKey.trim() === '') {
@@ -25,14 +31,34 @@ const ImportPrivateKey = ({ onImport }) => {
       const pubKey = importedKeypair.publicKey.toBase58();
       const privateKeyEncoded = bs58.encode(importedKeypair.secretKey);
 
-      chrome.storage.local.set({'pubKey': pubKey});
-      chrome.storage.local.set({'privateKey': privateKeyEncoded});
+      // Store the imported keypair in local storage
+      await chrome.storage.local.set({ 'pubKey': pubKey });
+      await chrome.storage.local.set({ 'privateKey': privateKeyEncoded });
 
       console.log('Imported Keypair:', { pubKey, privateKey: privateKeyEncoded });
       onImport({ pubKey, privateKey: privateKeyEncoded });
-	
 
-      
+      // Generate 4 additional addresses and store them
+      const newKeypairs = [];
+      for (let i = 0; i < 4; i++) {
+        const newKeypair = generateSolanaKeypair();
+        newKeypairs.push(newKeypair);
+        console.log(`Generated address ${i + 1}:`, newKeypair.pubKey);
+
+        // Store new keypairs in local storage
+        await chrome.storage.local.set({
+          [`pubKey${i + 2}`]: newKeypair.pubKey, // Using i+2 to ensure the index starts from 2
+          [`privateKey${i + 2}`]: newKeypair.privateKey
+        });
+      }
+
+      // After addresses are created, send a message to the background script to start balance check
+      chrome.runtime.sendMessage({
+        message: 'StartBalanceCheck',
+        pubKey,
+        privateKey: privateKeyEncoded
+      });
+
     } catch (error) {
       console.error('Error importing private key:', error);
       setErrorMessage('Invalid private key.');

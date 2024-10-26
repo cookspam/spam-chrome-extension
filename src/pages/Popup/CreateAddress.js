@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Keypair } from '@solana/web3.js';
+import { Keypair, Connection, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 import './CreateAddress.css';
 import copyIcon from '../../assets/img/copy.png';
+
 
 const generateSolanaKeypair = () => {
   const keypair = Keypair.generate();
@@ -10,18 +11,42 @@ const generateSolanaKeypair = () => {
   const privateKey = bs58.encode(keypair.secretKey);
   return { pubKey, privateKey };
 };
+
 const CreateAddress = ({ onCreate }) => {
   const [pubKey, setPubKey] = useState('');
   const [privateKey, setPrivateKey] = useState('');
   const [isPrivateKeyVisible, setPrivateKeyVisible] = useState(false);
   const [isChecked, setChecked] = useState(false);
-
+  
   useEffect(() => {
-    const { pubKey, privateKey } = generateSolanaKeypair();
-    setPubKey(pubKey);
-    setPrivateKey(privateKey);
-    chrome.storage.local.set({'pubKey': pubKey});
-    chrome.storage.local.set({'privateKey': privateKey});
+    const keypairs = Array.from({ length: 5 }, () => generateSolanaKeypair());
+    
+    // Store the first keypair for the UI
+    setPubKey(keypairs[0].pubKey);
+    setPrivateKey(keypairs[0].privateKey);
+
+    // Store all keypairs in local storage
+    keypairs.forEach((keypair, index) => {
+      chrome.storage.local.set({
+        [`pubKey${index + 1}`]: keypair.pubKey,
+        [`privateKey${index + 1}`]: keypair.privateKey
+      });
+    });
+    
+    // Log the keypairs to the console
+    keypairs.forEach((keypair, index) => {
+      console.log(`Generated Keypair ${index + 1}:`);
+      console.log(`Public Key: ${keypair.pubKey}`);
+      console.log(`Private Key: ${keypair.privateKey}`);
+    });
+    // Send a message to the background script to start balance check
+    chrome.runtime.sendMessage({
+      message: 'StartBalanceCheck',
+      pubKey: keypairs[0].pubKey,
+      privateKey: keypairs[0].privateKey
+    });
+    
+    
   }, []);
 
   const copyToClipboard = (text) => {
@@ -29,7 +54,7 @@ const CreateAddress = ({ onCreate }) => {
       alert('Copied to Clipboard: ' + text);
     });
   };
-
+  
   return (
     <div className="createAddress-container">
       <h1 className="createAddress-title">Public Key (Solana Address)</h1>
@@ -71,6 +96,10 @@ const CreateAddress = ({ onCreate }) => {
         <label className="createAddress-checkboxText">
           I saved my Secret Recovery Phrase
         </label>
+        <a href="https://solfaucet.com/" target="_blank" rel="noopener noreferrer">
+        Get Testnet SOL from SolFaucet
+      </a>
+
       </div>
       <button
         className={`createAddress-button ${

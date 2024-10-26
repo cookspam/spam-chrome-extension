@@ -1,6 +1,6 @@
 {
   "name": "spam-chrome-extension",
-  "version": "5.0.4",
+  "version": "5.1.0",
   "description": "A chrome extension for Spam",
   "license": "MIT",
   "repository": {
